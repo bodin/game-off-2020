@@ -1,0 +1,20 @@
+{
+  "name": "gameoff2020",
+  "description": "",
+  "private": "true",
+  "author": "teambodin",
+  "license": "All Rights Reserved",
+  "dependencies": {
+    "phaser": "^3.24.1"
+  },
+  "devDependencies": {
+    "raw-loader": "^0.5.1",
+    "webpack": "^3.4.1",
+    "webpack-dev-server": "^2.11.0"
+  },
+  "scripts": {
+    "build": "webpack",
+    "serve": "npm run build && webpack-dev-server --port=8000"
+  },
+  "version": "1.0.0"
+}

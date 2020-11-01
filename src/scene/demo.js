@@ -1,24 +1,24 @@
-import 'phaser'
+import {Scene} from 'phaser'
 
-function preload ()
-{
-    this.load.image('logo', 'assets/logo.png');
-}
+export default class DemoScene extends Scene {
+    constructor(config) {
+        super(config);
+    }
 
-function create ()
-{
-    var logo = this.add.image(400, 150, 'logo');
+    preload () {
+        this.load.image('logo', 'assets/logos.png');
+    }
 
-    this.tweens.add({
-        targets: logo,
-        y: 450,
-        duration: 2000,
-        ease: 'Power2',
-        yoyo: true,
-        loop: -1
-    });
-}
-export default {    
-    preload: preload,
-    create: create
+    create () {
+        var logo = this.add.image(400, 150, 'logo');
+
+        this.tweens.add({
+            targets: logo,
+            y: 450,
+            duration: 2000,
+            ease: 'Power2',
+            yoyo: true,
+            loop: -1
+        });
+    }
 }

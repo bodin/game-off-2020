@@ -1,15 +1,8 @@
 import {Scene} from 'phaser'
 import TILE from '../model/tiles'
+import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, WALL, DOOR, UNKNOWN} from '../model/dungeon'
 import Room from '../model/room'
 
-const TOP = 0
-const LEFT = 1
-const RIGHT = 2
-const BOTTOM = 3
-
-const WALL = 0;
-const DOOR = 1;
-const UNKNOWN = -1;
 
 export default class DungeonScene extends Scene {
    
@@ -23,33 +16,34 @@ export default class DungeonScene extends Scene {
     }
 
     create () {
-        let dungeon = this.makeDungeon(3,3);        
+        let dungeon = Dungeon.create('foo', 3, 3);        
         this.drawDungeon(dungeon, {offsetX:605, offsetY:5, width:190, height: 190})
 
-        const map = this.make.tilemap({ data: this.makeRoomTiles(25, 25, dungeon[0][0]), tileWidth: 24, tileHeight: 24 });
+        const map = this.make.tilemap({ data: this.makeRoomTiles(dungeon.rooms[0][0], 25, 25), tileWidth: 24, tileHeight: 24 });
         const tiles = map.addTilesetImage("tiles");
         const layer = map.createStaticLayer(0, tiles, 0, 0);
         
     }
+
     drawDungeon(dungeon,opts={}){
         
         const graphics = this.add.graphics();
-        const color_wall=0xff0000
-        const color_door=0x330000
+        const color_wall = opts.colorWall ||0xff0000
+        const color_door = opts.colorDoor ||0x330000
         const width = opts.width || 100
         const height = opts.height || 100
         const offsetX = opts.offsetX || 0 
         const offsetY = opts.offsetY || 0
 
 
-        const ph = height/dungeon.length
-        const pw = width/dungeon[0].length
+        const ph = height/dungeon.getRoomsTall()
+        const pw = width/dungeon.getRoomsWide()
 
         const spacer = 1
             
-        for(let row = 0; row < dungeon.length; row++){
-            for(let col = 0; col < dungeon[row].length; col++){
-                let doors =  dungeon[row][col].doors
+        for(let row = 0; row < dungeon.getRoomsTall(); row++){
+            for(let col = 0; col < dungeon.getRoomsWide(); col++){
+                let doors =  dungeon.getRoom(col, row).doors
                 
                 graphics.beginPath().lineStyle(1, doors[TOP] == WALL ? color_wall : color_door)
                     .moveTo(offsetX + col*pw+spacer, offsetY + row*ph+spacer)
@@ -71,36 +65,7 @@ export default class DungeonScene extends Scene {
         }
     }
 
-    makeDungeon(rows, columns){
-        let dungeon = new Array(rows)
-        let doors = new Array(4)
-        for(let row = 0; row < rows; row++){
-            dungeon[row] = new Array(columns)
-            for(let col = 0; col < columns; col++){
-                
-                doors[TOP] = row == 0 ? WALL : dungeon[row-1][col].doors[BOTTOM];
-                doors[BOTTOM] = row == rows-1 ? WALL : UNKNOWN;
-                doors[LEFT] = col == 0 ? WALL : dungeon[row][col-1].doors[RIGHT];
-                doors[RIGHT] = col == columns-1 ? WALL : UNKNOWN;
-
-                dungeon[row][col] = this.makeRoom(row + "-" + col, doors)
-            }
-        }
-        return dungeon
-    }
-    makeRoom(id, doors=[UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN]){
-        const result = new Room(id);
-        const door_probability = .8
-        result.doors = [...doors]
-        
-        if(doors[TOP] == UNKNOWN)       result.doors[0] = Math.random() > door_probability ? WALL : DOOR
-        if(doors[LEFT] == UNKNOWN)      result.doors[1] = Math.random() > door_probability ? WALL : DOOR
-        if(doors[RIGHT] == UNKNOWN)     result.doors[2] = Math.random() > door_probability ? WALL : DOOR
-        if(doors[BOTTOM] == UNKNOWN)    result.doors[3] = Math.random() > door_probability ? WALL : DOOR
-
-        return result
-    }
-    makeRoomTiles(width, height, room){
+    makeRoomTiles(room, width, height){
 
         const tile_index = [
             [TILE.CORNER_TOP_LEFT,TILE.WALL_TOP,TILE.CORNER_TOP_RIGHT],

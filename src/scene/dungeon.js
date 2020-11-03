@@ -12,7 +12,8 @@ export default class DungeonScene extends Scene {
     }
 
     preload () {        
-        this.load.image("tiles", "../assets/tileset/default.png");
+        this.load.image("tiles", "../assets/tileset/default.png")
+        this.load.image("dude", "../assets/dude.png")
     }
 
     create () {
@@ -22,7 +23,28 @@ export default class DungeonScene extends Scene {
         const map = this.make.tilemap({ data: this.makeRoomTiles(dungeon.rooms[0][0], 25, 25), tileWidth: 24, tileHeight: 24 });
         const tiles = map.addTilesetImage("tiles");
         const layer = map.createStaticLayer(0, tiles, 0, 0);
+
+        this.player = this.physics.add.sprite(200, 200, 'dude');
+        this.player.setCollideWorldBounds(true);
+        this.player.setScale(.2);
+        this.physics.add.collider(this.player, layer);
+        this.cursors = this.input.keyboard.createCursorKeys();
         
+    }
+
+    update(){
+        if (this.cursors.left.isDown) {
+            this.player.setX(this.player.x-5);
+        } 
+        if (this.cursors.right.isDown) {
+            this.player.setX(this.player.x+5);
+        } 
+        if (this.cursors.down.isDown) {
+            this.player.setY(this.player.y+5);
+        } 
+        if (this.cursors.up.isDown) {
+            this.player.setY(this.player.y-5);
+        }
     }
 
     drawDungeon(dungeon,opts={}){

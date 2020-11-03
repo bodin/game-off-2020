@@ -6,6 +6,8 @@ window.onload = () => {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
+        zoom: 1.25,
+        pixelArt: true,
         scene: [scene_dungeon]
     });
 };

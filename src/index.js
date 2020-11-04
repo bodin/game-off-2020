@@ -10,7 +10,10 @@ window.onload = () => {
         pixelArt: true,
         scene: [scene_dungeon],
         physics: {
-            default: "arcade"
+            default: "arcade",
+            arcade: {             
+                debug: true
+            }
         }
     });
 };

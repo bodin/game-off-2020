@@ -3,11 +3,29 @@ import TILE from '../model/tiles'
 import Player from '../model/player'
 import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, WALL, DOOR, UNKNOWN} from '../model/dungeon'
 
+const SCREEN_WIDTH = 800
+const SCREEN_HEIGHT = 600
+
+const TILE_WIDTH = 24
+const TILE_HEIGHT = 24
+const ROOM_TILE_WIDTH = 25
+const ROOM_TILE_HEIGHT = 25
+const ROOM_WIDTH = TILE_WIDTH * ROOM_TILE_WIDTH
+const ROOM_HEIGHT = TILE_HEIGHT * ROOM_TILE_HEIGHT
+
+const COLUMNS = 3
+const ROWS = 3
+
+const MAP_WIDTH = 180
+const MAP_HEIGHT = 180
+
+const MAP_SPACER = ((SCREEN_WIDTH - ROOM_WIDTH - MAP_WIDTH)/2)
+
 export default class DungeonScene extends Scene {
    
     constructor(config) {
-        super(config);
-        this.map = []
+        super(config)
+        this.currentRoom = 0
     }
 
     preload () {        
@@ -16,39 +34,70 @@ export default class DungeonScene extends Scene {
     }
 
     create () {
-        this.dungeon = Dungeon.create('foo', 3, 3);                
-        let dungeonTiles = this.makeDungeonTiles(this.dungeon, 25, 25)
+        this.dungeon = Dungeon.create('foo', COLUMNS, ROWS);                
+        let dungeonTiles = this.makeDungeonTiles(this.dungeon, ROOM_TILE_WIDTH, ROOM_TILE_HEIGHT)
 
-        const dungeonTileMap = this.make.tilemap({ data: dungeonTiles, tileWidth: 24, tileHeight: 24 });
+        const dungeonTileMap = this.make.tilemap({ data: dungeonTiles, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
         const tiles = dungeonTileMap.addTilesetImage("tiles");
         this.dungeonLayer = dungeonTileMap.createStaticLayer(0, tiles, 0, 0);
         this.dungeonLayer.setCollisionBetween(1, 115);
 
-        var dungeonContainer = this.add.container(600, 600);
-        dungeonContainer.add(this.dungeonLayer)
+        this.dungeonContainer = this.add.container(ROOM_WIDTH, ROOM_HEIGHT);
+        this.dungeonContainer.add(this.dungeonLayer)
 
-        var shape = this.make.graphics();
-        shape.fillStyle(0xffffff);
-        shape.beginPath();
-        shape.fillRect(0, 0, 600, 600);        
-        
-        dungeonContainer.setMask(shape.createGeometryMask());        
+        this.maskShape = this.make.graphics()
+            .fillStyle(0xffffff)
+            .beginPath()
+            .fillRect(0, 0, ROOM_WIDTH, ROOM_HEIGHT)
+            .generateTexture('mask', ROOM_WIDTH, ROOM_HEIGHT).generateTexture()
+
+        this.dungeonContainer.setMask(this.maskShape.createGeometryMask());
 
         this.player = new Player(this, 200, 200);
         this.physics.add.collider(this.player, this.dungeonLayer);
 
-        this.makeDungeonGraphic('dkey', this.dungeon, {width:190, height: 190})
-        this.map = this.add.sprite(605, 5, 'dkey').setOrigin(0,0)
+        this.makeMapGraphic('map', this.dungeon, {width:MAP_WIDTH, height: MAP_HEIGHT})
+        this.map = this.add.sprite(ROOM_WIDTH + MAP_SPACER, MAP_SPACER, 'map').setOrigin(0,0)
     }
 
     update(){
-        
-       this.map.x = this.cameras.main.worldView.x+605
-       this.map.y = this.cameras.main.worldView.y+5
 
+       this.map.x = this.cameras.main.worldView.x + ROOM_WIDTH + MAP_SPACER
+       this.map.y = this.cameras.main.worldView.y + MAP_SPACER
+
+       let room = this.getCurrentRoom();
+
+       if(!this.currentRoom || this.currentRoom.id != room.id){
+            this.currentRoom = room
+        
+            this.cameras.main.fadeOut(250, 0, 0, 0, function(camera, progress) {
+                this.player.canMove = false;
+                if (progress === 1) {
+                    this.maskShape.x = room.column * ROOM_WIDTH
+                    this.maskShape.y = room.row * ROOM_HEIGHT
+
+
+                    // Change camera boundaries when fade out complete.
+                    this.cameras.main.setBounds(room.column * ROOM_WIDTH,
+                        room.row * ROOM_HEIGHT,
+                        ROOM_WIDTH,
+                        ROOM_HEIGHT,
+                        true);
+
+                    // Fade back in with new boundareis.
+                    this.cameras.main.fadeIn(500, 0, 0, 0, function(camera, progress) {
+                        if (progress === 1) {
+                            // NOTHING TO DO WHEN ROOM IS THERE
+                        }
+                    }, this);
+                }
+            }, this);
+
+                 
+       }
     }
 
-    makeDungeonGraphic(key, dungeon, opts={}){
+    makeMapGraphic(key, dungeon, opts={}){
         
         const graphics = this.make.graphics({x: 0, y: 0});
         const color_wall = opts.colorWall | 0xff0000
@@ -56,43 +105,68 @@ export default class DungeonScene extends Scene {
         const width = opts.width || 100
         const height = opts.height || 100
 
-        const ph = height/dungeon.getRoomsTall()
-        const pw = width/dungeon.getRoomsWide()
+        const ph = height/dungeon.getRows()
+        const pw = width/dungeon.getColumns()
 
         const spacer = 1
         graphics.beginPath()
 
-        for(let row = 0; row < dungeon.getRoomsTall(); row++){
-            for(let col = 0; col < dungeon.getRoomsWide(); col++){
+        for(let row = 0; row < dungeon.getRows(); row++){
+            for(let col = 0; col < dungeon.getColumns(); col++){
                 let doors =  dungeon.getRoom(col, row).doors
                 
                 graphics
-                    .lineStyle(1, doors[TOP] == WALL ? color_wall : color_door)
+                    .beginPath().lineStyle(1, doors[TOP] == WALL ? color_wall : color_door)
                     .moveTo(col*pw+spacer, row*ph+spacer)
                     .lineTo((col+1)*pw-spacer, row*ph+spacer)
-                    .lineStyle(1, doors[BOTTOM] == WALL ? color_wall : color_door)
+                    .strokePath().beginPath().lineStyle(1, doors[BOTTOM] == WALL ? color_wall : color_door)
                     .moveTo(col*pw+spacer, (row+1)*ph-spacer)
                     .lineTo((col+1)*pw-spacer, (row+1)*ph-spacer)
-                    .lineStyle(1, doors[LEFT] == WALL ? color_wall : color_door)
+                    .strokePath().beginPath().lineStyle(1, doors[LEFT] == WALL ? color_wall : color_door)
                     .moveTo(col*pw+spacer, row*ph+spacer)
                     .lineTo(col*pw+spacer, (row+1)*ph-spacer)
-                    .lineStyle(1, doors[RIGHT] == WALL ? color_wall : color_door)
+                    .strokePath().beginPath().lineStyle(1, doors[RIGHT] == WALL ? color_wall : color_door)
                     .moveTo((col+1)*pw-spacer, row*ph+spacer)
                     .lineTo((col+1)*pw-spacer, (row+1)*ph-spacer)
+                    .strokePath()
             }
         }
 
-        return graphics.strokePath().generateTexture(key, width, height);
+        return graphics.generateTexture(key, width, height);
     }
 
-    makeDungeonTiles(dungeon, width, height){
-        const tiles = new Array(dungeon.getRoomsTall() * height)
-        for(let i = 0; i < tiles.length; i++){
-            tiles[i] = new Array(dungeon.getRoomsWide() * width)
+    getCurrentRoom(){
+
+        let roomNumber = 0
+        // loop through rooms in this level.
+        for (let i = 0; i < this.dungeon.getRooms().length; i++) {
+            const room = this.dungeon.getRooms()[i]
+
+            let roomLeft   = room.column * ROOM_WIDTH
+            let roomRight  = roomLeft + ROOM_WIDTH
+            let roomTop    = room.row * ROOM_HEIGHT
+            let roomBottom = roomTop + ROOM_HEIGHT
+
+            // Player is within the boundaries of this room.
+            if (this.player.x > roomLeft && this.player.x < roomRight &&
+                this.player.y > roomTop  && this.player.y < roomBottom) {
+
+                roomNumber = i;
+            }
         }
 
-        for(let i = 0; i < dungeon.getRoomsWide(); i++){
-            for(let j = 0; j < dungeon.getRoomsTall(); j++){
+        return this.dungeon.getRooms()[roomNumber]
+    }
+    
+
+    makeDungeonTiles(dungeon, width, height){
+        const tiles = new Array(dungeon.getRows() * height)
+        for(let i = 0; i < tiles.length; i++){
+            tiles[i] = new Array(dungeon.getColumns() * width)
+        }
+
+        for(let i = 0; i < dungeon.getColumns(); i++){
+            for(let j = 0; j < dungeon.getRows(); j++){
                 const roomTiles = this.makeRoomTiles(dungeon.getRoom(i, j), width, height);
                 this.copyRoomTiles(tiles, roomTiles, i, j)
             }

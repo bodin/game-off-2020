@@ -11,25 +11,31 @@ const UNKNOWN = -1
 
 class Dungeon {    
   
-    constructor(id){
+    constructor(id, col, row){
         this.id = id
+        this.columns = col
+        this.rows = row
         this.rooms = []
     }
 
-    getRoomsWide(){
-        return this.rooms[0].length
+    getColumns(){
+        return this.columns
     }
 
-    getRoomsTall(){
-        return this.rooms.length
+    getRows(){
+        return this.rows
     }
 
     getRoom(col, row){
         return this.rooms[row][col]
     }
 
+    getRooms(){
+        return this.rooms.flat()
+    }
+
     static create(id, columns, rows){
-        let dungeon = new Dungeon(id)
+        let dungeon = new Dungeon(id, columns, rows)
         let rooms = new Array(rows)
 
         let doors = new Array(4)
@@ -42,15 +48,15 @@ class Dungeon {
                 doors[LEFT] = col == 0 ? WALL : rooms[row][col-1].doors[RIGHT];
                 doors[RIGHT] = col == columns-1 ? WALL : UNKNOWN;
 
-                rooms[row][col] = Dungeon.createRoom(row + "-" + col, doors)
+                rooms[row][col] = Dungeon.createRoom(col + "-" + row, col, row, doors)
             }
         }
         dungeon.rooms = rooms
         return dungeon
     }
 
-    static createRoom(id, doors=[UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN]){
-        const result = new Room(id);
+    static createRoom(id, col, row, doors=[UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN]){
+        const result = new Room(id, col, row);
         const door_probability = .8
         result.doors = [...doors]
         

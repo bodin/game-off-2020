@@ -1,6 +1,7 @@
 import {Scene} from 'phaser'
 import TILE from '../model/tiles'
 import Player from '../model/player'
+import Map from '../model/map'
 import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, WALL, DOOR, UNKNOWN} from '../model/dungeon'
 
 const SCREEN_WIDTH = 800
@@ -56,9 +57,8 @@ export default class DungeonScene extends Scene {
 
         this.player = new Player(this, 200, 200);
         this.physics.add.collider(this.player, this.dungeonLayer);
-
-        this.makeMapGraphic('map', this.dungeon, {width:MAP_WIDTH, height: MAP_HEIGHT})
-        this.map = this.add.sprite(ROOM_WIDTH + MAP_SPACER, MAP_SPACER, 'map').setOrigin(0,0)
+      
+        this.map = new Map(this, ROOM_WIDTH + MAP_SPACER, MAP_SPACER)
 
         this.bossRoom = this.dungeon.getRoom(COLUMNS-1, ROWS-1)
     }
@@ -99,45 +99,6 @@ export default class DungeonScene extends Scene {
                 }, this);
             }
         }, this);
-    }
-
-    makeMapGraphic(key, dungeon, opts={}){
-        
-        const graphics = this.make.graphics({x: 0, y: 0});
-        const color_wall = opts.colorWall | 0xff0000
-        const color_door = opts.colorDoor || 0x330000
-        const width = opts.width || 100
-        const height = opts.height || 100
-
-        const ph = height/dungeon.getRows()
-        const pw = width/dungeon.getColumns()
-
-        const spacer = 1
-        graphics.beginPath()
-
-        for (let i = 0; i < this.dungeon.rooms.length; i++) {
-            const room = this.dungeon.rooms[i]
-            let col = room.column, row = room.row
-            let doors =  room.doors
-            
-            graphics
-                .beginPath().lineStyle(1, doors[TOP] == WALL ? color_wall : color_door)
-                .moveTo(col*pw+spacer, row*ph+spacer)
-                .lineTo((col+1)*pw-spacer, row*ph+spacer)
-                .strokePath().beginPath().lineStyle(1, doors[BOTTOM] == WALL ? color_wall : color_door)
-                .moveTo(col*pw+spacer, (row+1)*ph-spacer)
-                .lineTo((col+1)*pw-spacer, (row+1)*ph-spacer)
-                .strokePath().beginPath().lineStyle(1, doors[LEFT] == WALL ? color_wall : color_door)
-                .moveTo(col*pw+spacer, row*ph+spacer)
-                .lineTo(col*pw+spacer, (row+1)*ph-spacer)
-                .strokePath().beginPath().lineStyle(1, doors[RIGHT] == WALL ? color_wall : color_door)
-                .moveTo((col+1)*pw-spacer, row*ph+spacer)
-                .lineTo((col+1)*pw-spacer, (row+1)*ph-spacer)
-                .strokePath()
-            
-        }
-
-        return graphics.generateTexture(key, width, height);
     }
 
     getCurrentRoom(){

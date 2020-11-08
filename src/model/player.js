@@ -10,6 +10,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, frame) {
         super(scene, x, y, frame);
         this.scene = scene
+        
         scene.physics.world.enable(this);
         scene.add.existing(this);
         
@@ -17,7 +18,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setScale(.2);
         this.setBodySize(this.width,this.height,true)
                        
-        
         this.currentRoom = 0      
         this.velocity = 200
         this.canMove = true;

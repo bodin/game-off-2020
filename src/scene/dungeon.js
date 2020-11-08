@@ -1,8 +1,6 @@
 import {Scene} from 'phaser'
 import TILE from '../model/tiles'
 import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, WALL, DOOR, UNKNOWN} from '../model/dungeon'
-import Room from '../model/room'
-
 
 export default class DungeonScene extends Scene {
    
@@ -17,79 +15,114 @@ export default class DungeonScene extends Scene {
     }
 
     create () {
-        let dungeon = Dungeon.create('foo', 3, 3);        
-        this.drawDungeon(dungeon, {offsetX:605, offsetY:5, width:190, height: 190})
+        this.dungeon = Dungeon.create('foo', 3, 3);                
+        let dungeonTiles = this.makeDungeonTiles(this.dungeon, 25, 25)
 
-        const map = this.make.tilemap({ data: this.makeRoomTiles(dungeon.rooms[0][0], 25, 25), tileWidth: 24, tileHeight: 24 });
-        const tiles = map.addTilesetImage("tiles");
-        this.layer = map.createStaticLayer(0, tiles, 0, 0);
+        const dungeonTileMap = this.make.tilemap({ data: dungeonTiles, tileWidth: 24, tileHeight: 24 });
+        const tiles = dungeonTileMap.addTilesetImage("tiles");
+        this.dungeonLayer = dungeonTileMap.createStaticLayer(0, tiles, 0, 0);
+        this.dungeonLayer.setCollisionBetween(1, 115);
+
+        var dungeonContainer = this.add.container(600, 600);
+        dungeonContainer.add(this.dungeonLayer)
+
+        var shape = this.make.graphics();
+        shape.fillStyle(0xffffff);
+        shape.beginPath();
+        shape.fillRect(0, 0, 600, 600);        
         
+        dungeonContainer.setMask(shape.createGeometryMask());        
 
-        this.player = this.physics.add.sprite(200, 200, 'dude');
-        this.player.setCollideWorldBounds(true);
+        this.player = this.physics.add.sprite(200, 200, 'dude');       
         this.player.setScale(.2);
-
-        this.layer.setCollisionBetween(1, 115);
-        this.physics.add.collider(this.player, this.layer);
-
-        this.cursors = this.input.keyboard.createCursorKeys();
         
+        this.physics.add.collider(this.player, this.dungeonLayer);
+
+        this.makeDungeonGraphic('dkey', this.dungeon, {width:190, height: 190})
+        this.map = this.add.sprite(605, 5, 'dkey').setOrigin(0,0)
     }
 
     update(){
-        if (this.cursors.left.isDown) {
+        let cursors = this.input.keyboard.createCursorKeys()
+
+        if (cursors.left.isDown) {
             this.player.setVelocityX(-150);
-        } else if (this.cursors.right.isDown) {
+        } else if (cursors.right.isDown) {
             this.player.setVelocityX(150);
         } else {
             this.player.setVelocityX(0);
         }
 
-        if (this.cursors.down.isDown) {
+        if (cursors.down.isDown) {
             this.player.setVelocityY(150);
-        } else  if (this.cursors.up.isDown) {
+        } else  if (cursors.up.isDown) {
             this.player.setVelocityY(-150);
         } else {
             this.player.setVelocityY(0);
         }
+        
+       this.map.x = this.cameras.main.worldView.x+605
+       this.map.y = this.cameras.main.worldView.y+5
     }
 
-    drawDungeon(dungeon,opts={}){
+    makeDungeonGraphic(key, dungeon, opts={}){
         
-        const graphics = this.add.graphics();
-        const color_wall = opts.colorWall ||0xff0000
-        const color_door = opts.colorDoor ||0x330000
+        const graphics = this.make.graphics({x: 0, y: 0});
+        const color_wall = opts.colorWall | 0xff0000
+        const color_door = opts.colorDoor || 0x330000
         const width = opts.width || 100
         const height = opts.height || 100
-        const offsetX = opts.offsetX || 0 
-        const offsetY = opts.offsetY || 0
-
 
         const ph = height/dungeon.getRoomsTall()
         const pw = width/dungeon.getRoomsWide()
 
         const spacer = 1
-            
+        graphics.beginPath()
+
         for(let row = 0; row < dungeon.getRoomsTall(); row++){
             for(let col = 0; col < dungeon.getRoomsWide(); col++){
                 let doors =  dungeon.getRoom(col, row).doors
                 
-                graphics.beginPath().lineStyle(1, doors[TOP] == WALL ? color_wall : color_door)
-                    .moveTo(offsetX + col*pw+spacer, offsetY + row*ph+spacer)
-                    .lineTo(offsetX + (col+1)*pw-spacer, offsetY + row*ph+spacer)
-                    .strokePath()
-                    .beginPath().lineStyle(1, doors[BOTTOM] == WALL ? color_wall : color_door)
-                    .moveTo(offsetX + col*pw+spacer, offsetY + (row+1)*ph-spacer)
-                    .lineTo(offsetX + (col+1)*pw-spacer, offsetY + (row+1)*ph-spacer)
-                    .strokePath()
-                    .beginPath().lineStyle(1, doors[LEFT] == WALL ? color_wall : color_door)
-                    .moveTo(offsetX + col*pw+spacer, offsetY + row*ph+spacer)
-                    .lineTo(offsetX + col*pw+spacer, offsetY + (row+1)*ph-spacer)
-                    .strokePath()
-                    .beginPath().lineStyle(1, doors[RIGHT] == WALL ? color_wall : color_door)
-                    .moveTo(offsetX + (col+1)*pw-spacer, offsetY + row*ph+spacer)
-                    .lineTo(offsetX + (col+1)*pw-spacer, offsetY + (row+1)*ph-spacer)
-                    .strokePath(); 
+                graphics
+                    .lineStyle(1, doors[TOP] == WALL ? color_wall : color_door)
+                    .moveTo(col*pw+spacer, row*ph+spacer)
+                    .lineTo((col+1)*pw-spacer, row*ph+spacer)
+                    .lineStyle(1, doors[BOTTOM] == WALL ? color_wall : color_door)
+                    .moveTo(col*pw+spacer, (row+1)*ph-spacer)
+                    .lineTo((col+1)*pw-spacer, (row+1)*ph-spacer)
+                    .lineStyle(1, doors[LEFT] == WALL ? color_wall : color_door)
+                    .moveTo(col*pw+spacer, row*ph+spacer)
+                    .lineTo(col*pw+spacer, (row+1)*ph-spacer)
+                    .lineStyle(1, doors[RIGHT] == WALL ? color_wall : color_door)
+                    .moveTo((col+1)*pw-spacer, row*ph+spacer)
+                    .lineTo((col+1)*pw-spacer, (row+1)*ph-spacer)
+            }
+        }
+
+        return graphics.strokePath().generateTexture(key, width, height);
+    }
+
+    makeDungeonTiles(dungeon, width, height){
+        const tiles = new Array(dungeon.getRoomsTall() * height)
+        for(let i = 0; i < tiles.length; i++){
+            tiles[i] = new Array(dungeon.getRoomsWide() * width)
+        }
+
+        for(let i = 0; i < dungeon.getRoomsWide(); i++){
+            for(let j = 0; j < dungeon.getRoomsTall(); j++){
+                const roomTiles = this.makeRoomTiles(dungeon.getRoom(i, j), width, height);
+                this.copyRoomTiles(tiles, roomTiles, i, j)
+            }
+        }
+        return tiles
+    }
+    copyRoomTiles(dungeonTiles, roomTiles, col, row){
+        const offsetRow = roomTiles.length * row
+        const offsetCol = roomTiles[0].length * col
+
+        for(let i = 0; i < roomTiles.length; i++){
+            for(let j = 0; j < roomTiles[i].length; j++){
+                dungeonTiles[offsetRow + i][offsetCol + j] = roomTiles[i][j]
             }
         }
     }

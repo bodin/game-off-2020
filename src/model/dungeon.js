@@ -27,11 +27,7 @@ class Dungeon {
     }
 
     getRoom(col, row){
-        return this.rooms[row][col]
-    }
-
-    getRooms(){
-        return this.rooms.flat()
+        return this.rooms[row * this.cols + col]
     }
 
     static create(id, columns, rows){
@@ -51,7 +47,9 @@ class Dungeon {
                 rooms[row][col] = Dungeon.createRoom(col + "-" + row, col, row, doors)
             }
         }
-        dungeon.rooms = rooms
+        
+        dungeon.rooms = rooms.flat()
+
         return dungeon
     }
 

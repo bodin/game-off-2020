@@ -20,25 +20,26 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         this.currentRoom = 0      
         this.velocity = 200
+        this.canMove = true;
     }
 
     preUpdate(time, delta){
+        this.setVelocity(0, 0)
+
+        if(!this.canMove) return
+        
         let cursors = this.scene.input.keyboard.createCursorKeys()
 
         if (cursors.left.isDown) {
-            this.setVelocityX(this.velocity * -1);
+            this.setVelocityX(this.velocity * -1)
         } else if (cursors.right.isDown) {
-            this.setVelocityX(this.velocity);
-        } else {
-            this.setVelocityX(0);
+            this.setVelocityX(this.velocity)
         }
 
         if (cursors.down.isDown) {
-            this.setVelocityY(this.velocity);
+            this.setVelocityY(this.velocity)
         } else  if (cursors.up.isDown) {
-            this.setVelocityY(this.velocity * -1);
-        } else {
-            this.setVelocityY(0);
+            this.setVelocityY(this.velocity * -1)
         }  
     }
 }

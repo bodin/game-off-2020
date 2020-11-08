@@ -1,5 +1,6 @@
 import {Scene} from 'phaser'
 import TILE from '../model/tiles'
+import Player from '../model/player'
 import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, WALL, DOOR, UNKNOWN} from '../model/dungeon'
 
 export default class DungeonScene extends Scene {
@@ -11,7 +12,7 @@ export default class DungeonScene extends Scene {
 
     preload () {        
         this.load.image("tiles", "../assets/tileset/default.png")
-        this.load.image("dude", "../assets/dude.png")
+        this.load.image("player", "../assets/player.png")
     }
 
     create () {
@@ -33,9 +34,7 @@ export default class DungeonScene extends Scene {
         
         dungeonContainer.setMask(shape.createGeometryMask());        
 
-        this.player = this.physics.add.sprite(200, 200, 'dude');       
-        this.player.setScale(.2);
-        
+        this.player = new Player(this, 200, 200);
         this.physics.add.collider(this.player, this.dungeonLayer);
 
         this.makeDungeonGraphic('dkey', this.dungeon, {width:190, height: 190})
@@ -43,26 +42,10 @@ export default class DungeonScene extends Scene {
     }
 
     update(){
-        let cursors = this.input.keyboard.createCursorKeys()
-
-        if (cursors.left.isDown) {
-            this.player.setVelocityX(-150);
-        } else if (cursors.right.isDown) {
-            this.player.setVelocityX(150);
-        } else {
-            this.player.setVelocityX(0);
-        }
-
-        if (cursors.down.isDown) {
-            this.player.setVelocityY(150);
-        } else  if (cursors.up.isDown) {
-            this.player.setVelocityY(-150);
-        } else {
-            this.player.setVelocityY(0);
-        }
         
        this.map.x = this.cameras.main.worldView.x+605
        this.map.y = this.cameras.main.worldView.y+5
+
     }
 
     makeDungeonGraphic(key, dungeon, opts={}){

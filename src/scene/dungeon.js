@@ -217,30 +217,38 @@ export default class DungeonScene extends Scene {
 
         //top
         if(room.doors[TOP] == DOOR){
-            tiles[0][(width-1)/2-1]   = TILE.DOOR_HOR_LEFT
+            tiles[0][(width-1)/2-2]   = TILE.DOOR_HOR_LEFT
+            tiles[0][(width-1)/2-1]   = TILE.DOOR_HOR_MIDDLE
             tiles[0][(width-1)/2]     = TILE.DOOR_HOR_MIDDLE
-            tiles[0][(width-1)/2+1]   = TILE.DOOR_HOR_RIGHT
+            tiles[0][(width-1)/2+1]   = TILE.DOOR_HOR_MIDDLE
+            tiles[0][(width-1)/2+2]   = TILE.DOOR_HOR_RIGHT
         }
 
         //left
         if(room.doors[LEFT] == DOOR){
-            tiles[(height-1)/2-1][0]   = TILE.DOOR_VER_TOP
+            tiles[(height-1)/2-2][0]   = TILE.DOOR_VER_TOP
+            tiles[(height-1)/2-1][0]   = TILE.DOOR_VER_MIDDLE
             tiles[(height-1)/2][0]     = TILE.DOOR_VER_MIDDLE
-            tiles[(height-1)/2+1][0]   = TILE.DOOR_VER_BOTTOM
+            tiles[(height-1)/2+1][0]   = TILE.DOOR_VER_MIDDLE
+            tiles[(height-1)/2+2][0]   = TILE.DOOR_VER_BOTTOM
         }
 
         //right
         if(room.doors[RIGHT] == DOOR){
-            tiles[(height-1)/2-1][width-1]   = TILE.DOOR_VER_TOP
+            tiles[(height-1)/2-2][width-1]   = TILE.DOOR_VER_TOP
+            tiles[(height-1)/2-1][width-1]   = TILE.DOOR_VER_MIDDLE
             tiles[(height-1)/2][width-1]     = TILE.DOOR_VER_MIDDLE
-            tiles[(height-1)/2+1][width-1]   = TILE.DOOR_VER_BOTTOM
+            tiles[(height-1)/2+1][width-1]   = TILE.DOOR_VER_MIDDLE
+            tiles[(height-1)/2+2][width-1]   = TILE.DOOR_VER_BOTTOM
         }
 
         //bottom
         if(room.doors[BOTTOM] == DOOR){
-            tiles[height-1][(width-1)/2-1]   = TILE.DOOR_HOR_LEFT
+            tiles[height-1][(width-1)/2-2]   = TILE.DOOR_HOR_LEFT
+            tiles[height-1][(width-1)/2-1]   = TILE.DOOR_HOR_MIDDLE
             tiles[height-1][(width-1)/2]     = TILE.DOOR_HOR_MIDDLE
-            tiles[height-1][(width-1)/2+1]   = TILE.DOOR_HOR_RIGHT
+            tiles[height-1][(width-1)/2+1]   = TILE.DOOR_HOR_MIDDLE
+            tiles[height-1][(width-1)/2+2]   = TILE.DOOR_HOR_RIGHT
         }
         
         return tiles

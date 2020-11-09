@@ -24,16 +24,7 @@ export default class Map extends Phaser.GameObjects.Container {
         this.add(this.map).add(this.boss).add(this.player)
         this.change = false
 
-        this.playerTween = this.scene.tweens.add({
-            targets: this.player, 
-            ease: 'Linear',       
-            duration: 1000,            
-            paused: true,
-            delay:1000,
-            x:0,
-            y:0,
-            paused:true
-        })
+
     }
 
     preUpdate(time, delta){
@@ -52,11 +43,14 @@ export default class Map extends Phaser.GameObjects.Container {
 
         let playerRoom = this.scene.playerRoom
         if(playerRoom) {
-            //this.player.setX(playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2))
-            //this.player.setY(playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2))
-            this.playerTween.updateTo('x', playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2), true)
-            this.playerTween.updateTo('y', playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2) , true)
-            this.playerTween.play()
+            this.scene.tweens.add({
+                           targets: this.player, 
+                           ease: 'EaseIOut',       
+                           duration: 250,            
+                           delay:500,
+                           x: playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2),
+                           y:playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+                       })
         }
     }
     

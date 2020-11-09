@@ -2,25 +2,8 @@ import {Scene} from 'phaser'
 import TILE from '../model/tiles'
 import Player from '../model/player'
 import Map from '../model/map'
-import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, WALL, DOOR, UNKNOWN} from '../model/dungeon'
-
-const SCREEN_WIDTH = 800
-const SCREEN_HEIGHT = 600
-
-const TILE_WIDTH = 24
-const TILE_HEIGHT = 24
-const ROOM_TILE_WIDTH = 25
-const ROOM_TILE_HEIGHT = 25
-const ROOM_WIDTH = TILE_WIDTH * ROOM_TILE_WIDTH
-const ROOM_HEIGHT = TILE_HEIGHT * ROOM_TILE_HEIGHT
-
-const COLUMNS = 3
-const ROWS = 3
-
-const MAP_WIDTH = 180
-const MAP_HEIGHT = 180
-
-const MAP_SPACER = ((SCREEN_WIDTH - ROOM_WIDTH - MAP_WIDTH)/2)
+import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, DOOR} from '../model/dungeon'
+import * as C from '../model/constants'
 
 export default class DungeonScene extends Scene {
    
@@ -36,42 +19,43 @@ export default class DungeonScene extends Scene {
     }
 
     create () {
-        this.dungeon = Dungeon.create('foo', COLUMNS, ROWS);                
-        let dungeonTiles = this.makeDungeonTiles(this.dungeon, ROOM_TILE_WIDTH, ROOM_TILE_HEIGHT)
+        this.dungeon = Dungeon.create('foo', C.COLUMNS, C.ROWS);                
+        let dungeonTiles = this.makeDungeonTiles(this.dungeon, C.ROOM_TILE_WIDTH, C.ROOM_TILE_HEIGHT)
 
-        const dungeonTileMap = this.make.tilemap({ data: dungeonTiles, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
+        const dungeonTileMap = this.make.tilemap({ data: dungeonTiles, tileWidth: C.TILE_WIDTH, tileHeight: C.TILE_HEIGHT });
         const tiles = dungeonTileMap.addTilesetImage("tiles");
         this.dungeonLayer = dungeonTileMap.createStaticLayer(0, tiles, 0, 0);
         this.dungeonLayer.setCollisionBetween(1, 115);
 
-        this.dungeonContainer = this.add.container(ROOM_WIDTH, ROOM_HEIGHT);
+        this.dungeonContainer = this.add.container(C.ROOM_WIDTH, C.ROOM_HEIGHT);
         this.dungeonContainer.add(this.dungeonLayer)
 
         this.maskShape = this.make.graphics()
             .fillStyle(0xffffff)
             .beginPath()
-            .fillRect(0, 0, ROOM_WIDTH, ROOM_HEIGHT)
-            .generateTexture('mask', ROOM_WIDTH, ROOM_HEIGHT).generateTexture()
+            .fillRect(0, 0, C.ROOM_WIDTH, C.ROOM_HEIGHT)
+            .generateTexture('mask', C.ROOM_WIDTH, C.ROOM_HEIGHT).generateTexture()
 
         this.dungeonContainer.setMask(this.maskShape.createGeometryMask());
 
         this.player = new Player(this, 200, 200);
         this.physics.add.collider(this.player, this.dungeonLayer);
       
-        this.map = new Map(this, ROOM_WIDTH + MAP_SPACER, MAP_SPACER)
+        this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
 
-        this.bossRoom = this.dungeon.getRoom(COLUMNS-1, ROWS-1)
+        this.bossRoom = this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1)        
     }
 
     update(){
-        this.map.x = this.cameras.main.worldView.x + ROOM_WIDTH + MAP_SPACER
-        this.map.y = this.cameras.main.worldView.y + MAP_SPACER
+        this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
+        this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
 
         let room = this.getCurrentRoom();
 
         if(!this.playerRoom || this.playerRoom.id != room.id){
             this.playerRoom = room        
             this.changeRoomAnimimation()
+            this.map.change=true
         }
     }
 
@@ -81,14 +65,14 @@ export default class DungeonScene extends Scene {
         this.cameras.main.fadeOut(250, 0, 0, 0, function(camera, progress) {
             this.player.canMove = false
             if (progress === 1) {
-                this.maskShape.x = room.column * ROOM_WIDTH
-                this.maskShape.y = room.row * ROOM_HEIGHT
+                this.maskShape.x = room.column * C.ROOM_WIDTH
+                this.maskShape.y = room.row * C.ROOM_HEIGHT
 
                 // Change camera boundaries when fade out complete.
-                this.cameras.main.setBounds(room.column * ROOM_WIDTH,
-                    room.row * ROOM_HEIGHT,
-                    ROOM_WIDTH,
-                    ROOM_HEIGHT,
+                this.cameras.main.setBounds(room.column * C.ROOM_WIDTH,
+                    room.row * C.ROOM_HEIGHT,
+                    C.ROOM_WIDTH,
+                    C.ROOM_HEIGHT,
                     true)
 
                 // Fade back in with new boundareis.
@@ -108,10 +92,10 @@ export default class DungeonScene extends Scene {
         for (let i = 0; i < this.dungeon.rooms.length; i++) {
             const room = this.dungeon.rooms[i]
 
-            let roomLeft   = room.column * ROOM_WIDTH
-            let roomRight  = roomLeft + ROOM_WIDTH
-            let roomTop    = room.row * ROOM_HEIGHT
-            let roomBottom = roomTop + ROOM_HEIGHT
+            let roomLeft   = room.column * C.ROOM_WIDTH
+            let roomRight  = roomLeft + C.ROOM_WIDTH
+            let roomTop    = room.row * C.ROOM_HEIGHT
+            let roomBottom = roomTop + C.ROOM_HEIGHT
 
             // Player is within the boundaries of this room.
             if (this.player.x > roomLeft && this.player.x < roomRight &&

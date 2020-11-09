@@ -1,57 +1,87 @@
 import {TOP, BOTTOM, LEFT, RIGHT, WALL} from './dungeon'
+import * as C from './constants'
 
+const MARKER_SIZE=20
 
-const SCREEN_WIDTH = 800
-const SCREEN_HEIGHT = 600
+export default class Map extends Phaser.GameObjects.Container {
 
-const TILE_WIDTH = 24
-const TILE_HEIGHT = 24
-const ROOM_TILE_WIDTH = 25
-const ROOM_TILE_HEIGHT = 25
-const ROOM_WIDTH = TILE_WIDTH * ROOM_TILE_WIDTH
-const ROOM_HEIGHT = TILE_HEIGHT * ROOM_TILE_HEIGHT
-
-const COLUMNS = 3
-const ROWS = 3
-
-const MAP_WIDTH = 180
-const MAP_HEIGHT = 180
-
-const MAP_SPACER = ((SCREEN_WIDTH - ROOM_WIDTH - MAP_WIDTH)/2)
-
-export default class Map extends Phaser.GameObjects.Sprite {
-
-    constructor(scene, x, y, frame) {
-        super(scene, x, y, frame);
+    constructor(scene, x, y) {
+        super(scene);
         this.scene = scene
 
         scene.add.existing(this);
-        
-        this.makeMapGraphic('map', scene.dungeon, {width:MAP_WIDTH, height: MAP_HEIGHT})
-        this.setTexture('map');
 
-        this.setOrigin(0,0)
+        this.makeMapGraphic('map', scene.dungeon, C.MAP_WIDTH, C.MAP_HEIGHT)
+        this.makeMarkerSprite('boss-marker', MARKER_SIZE, 0xff0000)
+        this.makeMarkerSprite('player-marker', MARKER_SIZE, 0x00ff00)
+        
+        let _x = C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2), _y = C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+
+        this.map = this.scene.make.sprite({x:0,y:0,key:'map'}).setOrigin(0,0)
+        this.boss = this.scene.make.sprite({x:_x,y:_y,key:'boss-marker'}).setOrigin(0,0)
+        this.player = this.scene.make.sprite({x:_x,y:_y,key:'player-marker'}).setOrigin(0,0)        
+
+        this.add(this.map).add(this.boss).add(this.player)
+        this.change = false
+
+        this.playerTween = this.scene.tweens.add({
+            targets: this.player, 
+            ease: 'Linear',       
+            duration: 1000,            
+            paused: true,
+            delay:1000,
+            x:0,
+            y:0,
+            paused:true
+        })
     }
 
     preUpdate(time, delta){
-        this.x = this.scene.cameras.main.worldView.x + ROOM_WIDTH + MAP_SPACER
-        this.y = this.scene.cameras.main.worldView.y + MAP_SPACER
+        
+        //if(!this.change) return
+        this.change = false;
+
+        this.setX(this.scene.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER)
+        this.setY(this.scene.cameras.main.worldView.y + C.MAP_SPACER)
+
+        let bossRoom = this.scene.bossRoom
+        if(bossRoom) {
+            this.boss.x = bossRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2)
+            this.boss.y = bossRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+        }
+
+        let playerRoom = this.scene.playerRoom
+        if(playerRoom) {
+            //this.player.setX(playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2))
+            //this.player.setY(playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2))
+            this.playerTween.updateTo('x', playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2), true)
+            this.playerTween.updateTo('y', playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2) , true)
+            this.playerTween.play()
+        }
+    }
+    
+    makeMarkerSprite(key, width, color){
+        const graphics = this.scene.make.graphics({x: 0, y: 0});
+
+        graphics
+        .beginPath()
+        .lineStyle(2, color)
+        .arc(width/2,width/2,width/2,Phaser.Math.DegToRad(0), Phaser.Math.DegToRad(360))
+        .strokePath()
+
+        return graphics.generateTexture(key, width, width);
     }
 
-
-    makeMapGraphic(key, dungeon, opts={}){
+    makeMapGraphic(key, dungeon, width, height){
         
         const graphics = this.scene.make.graphics({x: 0, y: 0});
-        const color_wall = opts.colorWall | 0xff0000
-        const color_door = opts.colorDoor || 0x330000
-        const width = opts.width || 100
-        const height = opts.height || 100
+        const color_wall = 0xff0000
+        const color_door = 0x330000
 
         const ph = height/dungeon.getRows()
         const pw = width/dungeon.getColumns()
 
-        const spacer = 1
-        graphics.beginPath()
+        const spacer = 1    
 
         for (let i = 0; i < dungeon.rooms.length; i++) {
             const room = dungeon.rooms[i]

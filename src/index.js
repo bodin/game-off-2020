@@ -1,11 +1,13 @@
 import 'phaser';
 import scene_dungeon from './scene/dungeon'
 
+import * as C from './model/constants'
+
 window.onload = () => {
     new Phaser.Game({
         type: Phaser.AUTO,
-        width: 800,
-        height: 600,
+        width: C.SCREEN_WIDTH,
+        height: C.SCREEN_HEIGHT,
         //zoom: 1.25,
         pixelArt: true,
         scene: [scene_dungeon],

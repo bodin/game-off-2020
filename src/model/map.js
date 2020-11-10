@@ -23,8 +23,6 @@ export default class Map extends Phaser.GameObjects.Container {
 
         this.add(this.map).add(this.boss).add(this.player)
         this.change = false
-
-
     }
 
     preUpdate(time, delta){

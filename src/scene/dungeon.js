@@ -15,7 +15,10 @@ export default class DungeonScene extends Scene {
 
     preload () {        
         this.load.image("tiles", "./assets/tileset/default.png")
-        this.load.image("player", "./assets/player.png")
+        this.load.spritesheet("player", "./assets/player.png", {
+            frameWidth: 32,
+            frameHeight: 32
+        })            
     }
 
     create () {
@@ -23,7 +26,7 @@ export default class DungeonScene extends Scene {
         let dungeonTiles = this.makeDungeonTiles(this.dungeon, C.ROOM_TILE_WIDTH, C.ROOM_TILE_HEIGHT)
 
         const dungeonTileMap = this.make.tilemap({ data: dungeonTiles, tileWidth: C.TILE_WIDTH, tileHeight: C.TILE_HEIGHT });
-        const tiles = dungeonTileMap.addTilesetImage("tiles");
+        const tiles = dungeonTileMap.addTilesetImage("tiles");        
         this.dungeonLayer = dungeonTileMap.createStaticLayer(0, tiles, 0, 0);
         this.dungeonLayer.setCollisionBetween(1, 115);
 
@@ -38,15 +41,30 @@ export default class DungeonScene extends Scene {
 
         this.dungeonContainer.setMask(this.maskShape.createGeometryMask());
 
-        this.player = new Player(this, 200, 200);
+        this.player = new Player(this, 200, 200, 'player');
         this.physics.add.collider(this.player, this.dungeonLayer);
       
         this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
 
-        this.bossRoom = this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1)        
+        this.bossRoom = this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1)   
+        
+        this.anims.create({
+            key: 'walk-up',         
+            frameRate:10,   
+            frames: this.anims.generateFrameNumbers("player", { start: 1, end: 2 }),
+            repeat: 0
+        });     
+        this.anims.create({
+            key: 'walk-right',         
+            frameRate:10,   
+            frames: this.anims.generateFrameNumbers("player", { start: 3, end: 4 }),
+            repeat: 0
+        });     
     }
 
     update(){
+        
+
         this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
         this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
 

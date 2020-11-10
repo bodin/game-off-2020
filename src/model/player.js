@@ -7,39 +7,50 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * @param {number} y - Start location y value.
      * @param {number} [frame] -
      */
-    constructor(scene, x, y, frame) {
-        super(scene, x, y, frame);
+    constructor(scene, x, y, texture) {
+        super(scene, x, y, texture);
         this.scene = scene
         
-        scene.physics.world.enable(this);
-        scene.add.existing(this);
-        
-        this.setTexture('player');
-        this.setScale(.2);
-        this.setBodySize(this.width,this.height,true)
+        this.scene.physics.world.enable(this);
+        this.scene.add.existing(this);
+
+        this.setScale(3);
                        
         this.currentRoom = 0      
         this.velocity = 200
-        this.canMove = true;
+        this.canMove = true;          
     }
 
     preUpdate(time, delta){
-        this.setVelocity(0, 0)
+        super.preUpdate(time, delta)
+        
+        this.setVelocity(0, 0)       
 
         if(!this.canMove) return
         
         let cursors = this.scene.input.keyboard.createCursorKeys()
 
         if (cursors.left.isDown) {
+            this.play('walk-right', true)
             this.setVelocityX(this.velocity * -1)
+            this.flipX=true
         } else if (cursors.right.isDown) {
+            this.play('walk-right', true)
             this.setVelocityX(this.velocity)
+            this.flipX=false
         }
 
         if (cursors.down.isDown) {
+            this.play('walk-up', true)
             this.setVelocityY(this.velocity)
+            this.flipY=true
         } else if (cursors.up.isDown) {
+            this.play('walk-up', true)
             this.setVelocityY(this.velocity * -1)
-        }  
+            this.flipY=false
+        }
+        if(!cursors.down){
+            this.anims.get
+        }
     }
 }

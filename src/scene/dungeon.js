@@ -14,8 +14,8 @@ export default class DungeonScene extends Scene {
     }
 
     preload () {        
-        this.load.image("tiles", "../assets/tileset/default.png")
-        this.load.image("player", "../assets/player.png")
+        this.load.image("tiles", "./assets/tileset/default.png")
+        this.load.image("player", "./assets/player.png")
     }
 
     create () {

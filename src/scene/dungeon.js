@@ -13,6 +13,7 @@ export default class DungeonScene extends Scene {
         super(config)
         this.playerRoom = undefined
         this.heroRoom = undefined
+        this.gameOver = undefined
     }
 
     preload () {        
@@ -51,7 +52,17 @@ export default class DungeonScene extends Scene {
         this.hero = new Hero(this, 200, 200, 'player');
         this.physics.add.collider(this.hero, this.dungeonLayer);
 
-        this.physics.add.collider(this.player, this.hero);
+        this.physics.add.collider(this.player, this.hero, function (player, hero) {
+            if (!this.isGameOver) {
+                //player.play("explode");
+                //player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
+                    player.destroy();
+                //});
+                this.isGameOver = true;
+            }
+        });
+
+
       
         this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)       
         
@@ -90,7 +101,7 @@ export default class DungeonScene extends Scene {
             this.player.canMove = false
             if (progress === 1) {
                 this.heroRoom = this.hero.nextRoom(this.dungeon, this.playerRoom, this.heroRoom)
-                
+
                 this.maskShape.x = room.column * C.ROOM_WIDTH
                 this.maskShape.y = room.row * C.ROOM_HEIGHT
 

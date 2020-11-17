@@ -28,9 +28,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         super.preUpdate(time, delta)
 
         if(!this.canMove) return
-        
-        this.setVelocity(0,0)
-
+    
         let room = this.scene.heroRoom
         if(this.roomId != room.id) {
 
@@ -39,6 +37,11 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.setY(C.ROOM_HEIGHT * room.row + C.ROOM_HEIGHT/2)
 
             this.setVelocity(0,0)
+
+        }else if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
+            let playerX = this.scene.player.x, playerY = this.scene.player.y
+            this.setVelocityX(-1 * (this.x - playerX))
+            this.setVelocityY(-1 * (this.y - playerY))
         }
     }
 
@@ -50,7 +53,6 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         if(heroRoom.doors[C.LEFT] == C.DOOR) choices.push(C.LEFT)
         if(heroRoom.doors[C.RIGHT] == C.DOOR) choices.push(C.RIGHT)
 
-        
         let choice = choices[Math.floor(Math.random() * choices.length)];
         if(choice == C.TOP) return dungeon.getRoom(heroRoom.column, heroRoom.row - 1)
         if(choice == C.BOTTOM) return dungeon.getRoom(heroRoom.column, heroRoom.row + 1)

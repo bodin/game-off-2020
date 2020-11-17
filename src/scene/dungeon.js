@@ -1,6 +1,8 @@
 import {Scene} from 'phaser'
 import TILE from '../model/tiles'
 import Player from '../model/player'
+import Hero from '../model/hero'
+
 import Map from '../model/map'
 import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, DOOR} from '../model/dungeon'
 import * as C from '../model/constants'
@@ -10,7 +12,7 @@ export default class DungeonScene extends Scene {
     constructor(config) {
         super(config)
         this.playerRoom = undefined
-        this.bossRoom = undefined
+        this.heroRoom = undefined
     }
 
     preload () {        
@@ -41,12 +43,17 @@ export default class DungeonScene extends Scene {
 
         this.dungeonContainer.setMask(this.maskShape.createGeometryMask());
 
-        this.player = new Player(this, 200, 200, 'player');
+        this.playerRoom = this.dungeon.getRoom(0, 0)   
+        this.player = new Player(this, 200, 200, 'player');        
         this.physics.add.collider(this.player, this.dungeonLayer);
-      
-        this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
 
-        this.bossRoom = this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1)   
+        this.heroRoom = this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1)   
+        this.hero = new Hero(this, 200, 200, 'player');
+        this.physics.add.collider(this.hero, this.dungeonLayer);
+
+        this.physics.add.collider(this.player, this.hero);
+      
+        this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)       
         
         this.anims.create({
             key: 'walk-up',         
@@ -63,7 +70,6 @@ export default class DungeonScene extends Scene {
     }
 
     update(){
-        
 
         this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
         this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
@@ -83,6 +89,8 @@ export default class DungeonScene extends Scene {
         this.cameras.main.fadeOut(250, 0, 0, 0, function(camera, progress) {
             this.player.canMove = false
             if (progress === 1) {
+                this.heroRoom = this.hero.nextRoom(this.dungeon, this.playerRoom, this.heroRoom)
+                
                 this.maskShape.x = room.column * C.ROOM_WIDTH
                 this.maskShape.y = room.row * C.ROOM_HEIGHT
 

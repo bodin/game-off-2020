@@ -18,36 +18,44 @@ export default class Map extends Phaser.GameObjects.Container {
         let _x = C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2), _y = C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
 
         this.map = this.scene.make.sprite({x:0,y:0,key:'map'}).setOrigin(0,0)
-        this.boss = this.scene.make.sprite({x:_x,y:_y,key:'boss-marker'}).setOrigin(0,0)
+        this.hero = this.scene.make.sprite({x:_x,y:_y,key:'boss-marker'}).setOrigin(0,0)
         this.player = this.scene.make.sprite({x:_x,y:_y,key:'player-marker'}).setOrigin(0,0)        
 
-        this.add(this.map).add(this.boss).add(this.player)
-        this.change = false
+        this.add(this.map).add(this.hero).add(this.player)
+
+        this.playerId = undefined
+        this.heroId = undefined
+        
     }
 
     preUpdate(time, delta){
         
-        //if(!this.change) return
-        this.change = false;
-
         this.setX(this.scene.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER)
         this.setY(this.scene.cameras.main.worldView.y + C.MAP_SPACER)
 
-        let bossRoom = this.scene.bossRoom
-        if(bossRoom) {
-            this.boss.x = bossRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2)
-            this.boss.y = bossRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+        let heroRoom = this.scene.heroRoom
+        if(this.heroId != heroRoom.id) {
+            this.heroId = heroRoom.id
+            this.scene.tweens.add({
+                targets: this.hero, 
+                ease: 'EaseIOut',       
+                duration: 250,            
+                delay:500,
+                x: heroRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2),
+                y: heroRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+            })
         }
 
         let playerRoom = this.scene.playerRoom
-        if(playerRoom) {
+        if(this.playerId != playerRoom.id) {
+            this.playerId = playerRoom.id
             this.scene.tweens.add({
                            targets: this.player, 
                            ease: 'EaseIOut',       
                            duration: 250,            
                            delay:500,
                            x: playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2),
-                           y:playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+                           y: playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
                        })
         }
     }

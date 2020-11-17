@@ -15,10 +15,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.add.existing(this);
 
         this.setScale(3);
-                       
-        this.currentRoom = 0      
+                          
         this.velocity = 200
-        this.canMove = true;          
+        this.canMove = true;                  
     }
 
     preUpdate(time, delta){
@@ -48,9 +47,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.play('walk-up', true)
             this.setVelocityY(this.velocity * -1)
             this.flipY=false
-        }
-        if(!cursors.down){
-            this.anims.get
         }
     }
 }

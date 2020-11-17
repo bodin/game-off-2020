@@ -22,6 +22,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         this.setBounce(.2, .2)
         this.canMove = true 
         this.roomId = undefined
+        this.door = C.UNKNOWN
     }
 
     preUpdate(time, delta){
@@ -31,11 +32,20 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
     
         let room = this.scene.heroRoom
         if(this.roomId != room.id) {
-
             this.roomId = room.id
-            this.setX(C.ROOM_WIDTH * room.column + C.ROOM_WIDTH/2)
-            this.setY(C.ROOM_HEIGHT * room.row + C.ROOM_HEIGHT/2)
 
+            let offsetX = C.ROOM_WIDTH/2
+            let offsetY =  C.ROOM_HEIGHT/2
+
+            if(this.door != C.UNKNOWN){            
+                if(this.door == C.TOP) offsetY = C.ROOM_HEIGHT
+                else if(this.door == C.BOTTOM) offsetY = 0
+                else if(this.door == C.LEFT) offsetX = C.ROOM_WIDTH
+                else if(this.door == C.RIGHT) offsetX = 0
+            }
+
+            this.setX((C.ROOM_WIDTH * room.column) + offsetX)
+            this.setY((C.ROOM_HEIGHT * room.row) + offsetY)
             this.setVelocity(0,0)
 
         }else if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
@@ -54,10 +64,19 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         if(heroRoom.doors[C.RIGHT] == C.DOOR) choices.push(C.RIGHT)
 
         let choice = choices[Math.floor(Math.random() * choices.length)];
-        if(choice == C.TOP) return dungeon.getRoom(heroRoom.column, heroRoom.row - 1)
-        if(choice == C.BOTTOM) return dungeon.getRoom(heroRoom.column, heroRoom.row + 1)
-        if(choice == C.LEFT) return dungeon.getRoom(heroRoom.column-1, heroRoom.row)
-        if(choice == C.RIGHT) return dungeon.getRoom(heroRoom.column+1, heroRoom.row)
+        if(choice == C.TOP){
+            this.door = C.TOP;
+            return dungeon.getRoom(heroRoom.column, heroRoom.row - 1)
+        } else if(choice == C.BOTTOM){
+            this.door = C.BOTTOM;
+            return dungeon.getRoom(heroRoom.column, heroRoom.row + 1)
+        } else if(choice == C.LEFT){
+            this.door = C.LEFT;
+            return dungeon.getRoom(heroRoom.column-1, heroRoom.row)
+        } else if(choice == C.RIGHT){
+            this.door = C.RIGHT;
+            return dungeon.getRoom(heroRoom.column+1, heroRoom.row)
+        } 
 
         return heroRoom
     }

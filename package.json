@@ -14,7 +14,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "serve": "npm run build && webpack-dev-server --port=8000"
+    "serve": "npm run build && webpack-dev-server --port=8000",
+    "package": "mkdir build && npm run build && zip -r build/game.zip index.html assets/ dist/"
   },
   "version": "1.0.0"
 }

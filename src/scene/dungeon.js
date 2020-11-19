@@ -63,7 +63,7 @@ export default class DungeonScene extends Scene {
                 hero.alpha=0.2
                 player.play("player-explode");
                 player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
-                    player.destroy();
+                    player.setFrame(14);
                 });
                 this.isGameOver = true;
             }

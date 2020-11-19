@@ -8,13 +8,12 @@ window.onload = () => {
         type: Phaser.AUTO,
         width: C.SCREEN_WIDTH,
         height: C.SCREEN_HEIGHT,
-        //zoom: 1.25,
         pixelArt: true,
         scene: [scene_dungeon],
         physics: {
             default: "arcade",
             arcade: {             
-                debug: true
+                debug: false
             }
         }
     });

@@ -18,17 +18,35 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.world.enable(this);
         this.scene.add.existing(this);
 
-        this.setScale(3);                    
+        this.setScale(2);
+
         this.setBounce(.2, .2)
+
         this.canMove = true 
         this.roomId = undefined
         this.door = C.UNKNOWN
+
+        this.scene.anims.create({
+            key: 'hero-walk-up',
+            frameRate:10,   
+            frames: this.scene.anims.generateFrameNumbers(texture, { start: 1, end: 2 }),
+            repeat: -1
+        });     
+        this.scene.anims.create({
+            key: 'hero-walk-right',         
+            frameRate:10,   
+            frames: this.scene.anims.generateFrameNumbers(texture, { start: 3, end: 4 }),
+            repeat: 0
+        }); 
     }
 
     preUpdate(time, delta){
         super.preUpdate(time, delta)
 
-        if(!this.canMove) return
+        if(!this.canMove) {
+            this.setVelocity(0,0)
+            return
+        }
     
         let room = this.scene.heroRoom
         if(this.roomId != room.id) {
@@ -52,6 +70,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             let playerX = this.scene.player.x, playerY = this.scene.player.y
             this.setVelocityX(-1 * (this.x - playerX))
             this.setVelocityY(-1 * (this.y - playerY))
+            this.play("hero-walk-up", true)
         }
     }
 

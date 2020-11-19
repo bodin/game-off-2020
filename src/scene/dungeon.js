@@ -22,6 +22,10 @@ export default class DungeonScene extends Scene {
             frameWidth: 32,
             frameHeight: 32
         })            
+        this.load.spritesheet("hero", "./assets/hero.png", {
+            frameWidth: 32,
+            frameHeight: 32
+        })   
     }
 
     create () {
@@ -49,15 +53,18 @@ export default class DungeonScene extends Scene {
         this.physics.add.collider(this.player, this.dungeonLayer);
 
         this.heroRoom = this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1)   
-        this.hero = new Hero(this, 200, 200, 'player');
+        this.hero = new Hero(this, 200, 200, 'hero');
         this.physics.add.collider(this.hero, this.dungeonLayer);
 
         this.physics.add.collider(this.player, this.hero, function (player, hero) {
             if (!this.isGameOver) {
-                //player.play("explode");
-                //player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
+                player.canMove = false
+                hero.canMove = false
+                hero.alpha=0.2
+                player.play("player-explode");
+                player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
                     player.destroy();
-                //});
+                });
                 this.isGameOver = true;
             }
         });
@@ -66,18 +73,7 @@ export default class DungeonScene extends Scene {
       
         this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)       
         
-        this.anims.create({
-            key: 'walk-up',         
-            frameRate:10,   
-            frames: this.anims.generateFrameNumbers("player", { start: 1, end: 2 }),
-            repeat: 0
-        });     
-        this.anims.create({
-            key: 'walk-right',         
-            frameRate:10,   
-            frames: this.anims.generateFrameNumbers("player", { start: 3, end: 4 }),
-            repeat: 0
-        });     
+        
     }
 
     update(){

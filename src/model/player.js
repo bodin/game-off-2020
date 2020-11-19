@@ -14,10 +14,29 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.world.enable(this);
         this.scene.add.existing(this);
 
-        this.setScale(3);
+        this.setScale(2);
                           
         this.velocity = 200
-        this.canMove = true;                  
+        this.canMove = true;     
+        
+        this.scene.anims.create({
+            key: 'player-walk-up',
+            frameRate:10,   
+            frames: this.scene.anims.generateFrameNumbers(texture, { start: 1, end: 2 }),
+            repeat: 0
+        });     
+        this.scene.anims.create({
+            key: 'player-walk-right',         
+            frameRate:10,   
+            frames: this.scene.anims.generateFrameNumbers(texture, { start: 3, end: 4 }),
+            repeat: 0
+        }); 
+        this.scene.anims.create({
+            key: 'player-explode',         
+            frameRate:10,   
+            frames: this.scene.anims.generateFrameNumbers(texture, { start: 5, end: 14 }),
+            repeat: 0
+        });     
     }
 
     preUpdate(time, delta){
@@ -30,21 +49,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         let cursors = this.scene.input.keyboard.createCursorKeys()
 
         if (cursors.left.isDown) {
-            this.play('walk-right', true)
+            this.play('player-walk-right', true)
             this.setVelocityX(this.velocity * -1)
             this.flipX=true
         } else if (cursors.right.isDown) {
-            this.play('walk-right', true)
+            this.play('player-walk-right', true)
             this.setVelocityX(this.velocity)
             this.flipX=false
         }
 
         if (cursors.down.isDown) {
-            this.play('walk-up', true)
+            this.play('player-walk-up', true)
             this.setVelocityY(this.velocity)
             this.flipY=true
         } else if (cursors.up.isDown) {
-            this.play('walk-up', true)
+            this.play('player-walk-up', true)
             this.setVelocityY(this.velocity * -1)
             this.flipY=false
         }

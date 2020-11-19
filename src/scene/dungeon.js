@@ -68,12 +68,8 @@ export default class DungeonScene extends Scene {
                 this.isGameOver = true;
             }
         });
-
-
       
-        this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)       
-        
-        
+        this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
     }
 
     update(){

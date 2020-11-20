@@ -28,6 +28,8 @@ class Dungeon {
     }
 
     getRoom(col, row){
+        if(col < 0 || col >= C.COLUMNS) return undefined
+        if(row < 0 || row >= C.ROWS) return undefined
         return this.rooms[row * this.columns + col]
     }
 
@@ -68,12 +70,13 @@ class Dungeon {
     }
 
     adjust(){
+        console.log(this.rooms)
         let roomMap = new Map()
-        let roomGroups = []
-        let toVisit = [...this.rooms]
-
         this.rooms.forEach( function(r){roomMap.set(r.id, r)})
-        
+        let allRoomMap = new Map([...roomMap])
+
+        let roomGroups = []
+
         while(roomMap.size > 0){
             let toVisit = [...roomMap.values()]
             let group = this.adjustInternal(toVisit.pop(), new Map())
@@ -101,9 +104,39 @@ class Dungeon {
                     console.log("INTERSECTION", intersection)
                     roomGroups.splice(i, 1);
                     roomGroups[0] = new Map([...roomGroups[0], ...groupToCheck])
+                    let selected = intersection.values().next().value;
+                    console.log("SELECTED", selected)
+                    let room1 = expanded.get(selected);
+                    let room2 = allRoomMap.get(selected);
+                    console.log("MERGE", room1, room2)
                     console.log("LEFT", [...roomGroups])
-
-                    //add a door?????
+                    if(room1 && room2){
+                        if(room1.column == room2.column){
+                            if(room1.row > room2.row){
+                                //room1 below room2
+                                room1.doors[C.TOP] = C.DOOR
+                                room2.doors[C.BOTTOM] = C.DOOR
+                                console.log("top bottom")
+                            }else{
+                                //room1 above room2
+                                room1.doors[C.BOTTOM] = C.DOOR
+                                room2.doors[C.TOP] = C.DOOR
+                                console.log("bottom top")
+                            }
+                        } else {
+                            if(room1.column > room2.column){
+                                //room1 right of room2
+                                room1.doors[C.LEFT] = C.DOOR
+                                room2.doors[C.RIGHT] = C.DOOR
+                                console.log("left right")
+                            }else{
+                                //room1 left of room2
+                                room1.doors[C.RIGHT] = C.DOOR
+                                room2.doors[C.LEFT] = C.DOOR
+                                console.log("right left")
+                            }
+                        }
+                    }
                 }
             }
             
@@ -112,7 +145,7 @@ class Dungeon {
                 return this
             }
         }
-
+        console.log(this.rooms)
         return this
     }
     expandGroup(groupToExpand){
@@ -122,20 +155,31 @@ class Dungeon {
           
             if(roomToExpand.doors[C.TOP] == C.WALL){
                 let expand = this.getRoom(roomToExpand.column, roomToExpand.row-1)
-                if(expand && !groupToExpand.has(expand.id)) expanded.set(expand.id, expand)
-                
+                if(expand && !groupToExpand.has(expand.id)) {
+                    console.log("EXPANDING TOP", expand.id, roomToExpand)
+                    expanded.set(expand.id, roomToExpand)                
+                }
             }
             if(roomToExpand.doors[C.BOTTOM] == C.WALL){
                 let expand = this.getRoom(roomToExpand.column, roomToExpand.row+1)
-                if(expand && !groupToExpand.has(expand.id)) expanded.set(expand.id, expand)
+                if(expand && !groupToExpand.has(expand.id)) {
+                    console.log("EXPANDING BOTTOM", expand.id, roomToExpand)
+                    expanded.set(expand.id, roomToExpand)
+                }
             }
             if(roomToExpand.doors[C.LEFT] == C.WALL){
                 let expand = this.getRoom(roomToExpand.column-1, roomToExpand.row)
-                if(expand && !groupToExpand.has(expand.id)) expanded.set(expand.id, expand)
+                if(expand && !groupToExpand.has(expand.id)) {
+                    console.log("EXPANDING LEFT", expand.id, roomToExpand)
+                    expanded.set(expand.id, roomToExpand)
+                }
             }
             if(roomToExpand.doors[C.RIGHT] == C.WALL){
                 let expand = this.getRoom(roomToExpand.column+1, roomToExpand.row)
-                if(expand && !groupToExpand.has(expand.id)) expanded.set(expand.id, expand)
+                if(expand && !groupToExpand.has(expand.id)) {
+                    console.log("EXPANDING RIGHT", expand.id, roomToExpand)
+                    expanded.set(expand.id, roomToExpand)
+                }
             }
         }
         return expanded;

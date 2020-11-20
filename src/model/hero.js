@@ -63,8 +63,6 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.setX((C.ROOM_WIDTH * room.column) + offsetX)
             this.setY((C.ROOM_HEIGHT * room.row) + offsetY)
 
-
-
         } else if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
             let playerX = this.scene.player.x, playerY = this.scene.player.y
             this.setVelocityX(-1 * (this.x - playerX))

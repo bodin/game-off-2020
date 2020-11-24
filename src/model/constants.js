@@ -30,4 +30,4 @@ export const WALL = 0
 export const DOOR = 1
 export const UNKNOWN = -1
 
-export const DOOR_PROBABILITY = 0.4
+export const DOOR_PROBABILITY = 0.85

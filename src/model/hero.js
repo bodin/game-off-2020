@@ -96,7 +96,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             let vectorY = this.scene.playerRoom.row - this.scene.heroRoom.row
             
             let choice = undefined
-            if(Math.abs(vectorX) > Math.abs(vectorY)){
+            if(Math.abs(vectorX) >= Math.abs(vectorY)){
                 //left right
                 if(vectorX < 0 && heroRoom.doors[C.LEFT] == C.DOOR){
                     choice = C.LEFT
@@ -112,6 +112,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
                     choice = C.BOTTOM
                 }                
             }
+
             
             if(choice == C.TOP){
                 this.door = C.TOP;

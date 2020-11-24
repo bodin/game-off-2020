@@ -62,9 +62,14 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.setY((C.ROOM_HEIGHT * room.row) + offsetY)
 
         } else if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
-            let playerX = this.scene.player.x, playerY = this.scene.player.y
-            this.setVelocityX(-1 * (this.x - playerX))
-            this.setVelocityY(-1 * (this.y - playerY))
+            let vectorX = this.scene.player.x - this.x, vectorY = this.scene.player.y - this.y
+
+            let normal = Math.max(Math.abs(vectorX), Math.abs(vectorY))
+            vectorX = vectorX/normal
+            vectorY = vectorY/normal
+
+            this.setVelocity(500*vectorX, 500*vectorY)
+
             this.play("hero-walk-up", true)
             this.skipNextRoom = true
         }        

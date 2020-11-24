@@ -12,7 +12,6 @@ export default class StaticScene extends Scene {
     }
 
     preload () {
-        console.log(this.key, this.image)
         this.load.spritesheet('scene-' + this.key, this.image, {
             frameWidth: C.SCREEN_WIDTH,
             frameHeight: C.SCREEN_HEIGHT

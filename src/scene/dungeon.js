@@ -9,8 +9,8 @@ import * as C from '../model/constants'
 
 export default class DungeonScene extends Scene {
    
-    constructor(config) {
-        super(config)
+    constructor() {        
+        super('dungeon-scene')
         this.playerRoom = undefined
         this.heroRoom = undefined
         this.gameOver = undefined
@@ -70,6 +70,8 @@ export default class DungeonScene extends Scene {
         });
       
         this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
+
+        this.cameras.main.fadeIn(1000, 0, 0, 0)        
     }
 
     update(){

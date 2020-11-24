@@ -45,11 +45,13 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         if(!this.canMove) return
     
         let room = this.scene.heroRoom
+        // in room mode
         if (this.roomId != room.id) {
+            this.visible = false
             this.roomId = room.id
            
             let offsetX = C.ROOM_WIDTH/2
-            let offsetY =  C.ROOM_HEIGHT/2
+            let offsetY = C.ROOM_HEIGHT/2
 
             if(this.door != C.UNKNOWN){            
                 if(this.door == C.TOP) offsetY = C.ROOM_HEIGHT
@@ -61,7 +63,9 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.setX((C.ROOM_WIDTH * room.column) + offsetX)
             this.setY((C.ROOM_HEIGHT * room.row) + offsetY)
 
+        // attack mode
         } else if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
+            this.visible = true
             let vectorX = this.scene.player.x - this.x, vectorY = this.scene.player.y - this.y
 
             let normal = Math.max(Math.abs(vectorX), Math.abs(vectorY))
@@ -79,13 +83,36 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         this.door = C.UNKNOWN
 
         if(!this.skipNextRoom){
-            let choices = []
-            if(heroRoom.doors[C.TOP] == C.DOOR) choices.push(C.TOP)
-            if(heroRoom.doors[C.BOTTOM] == C.DOOR) choices.push(C.BOTTOM)
-            if(heroRoom.doors[C.LEFT] == C.DOOR) choices.push(C.LEFT)
-            if(heroRoom.doors[C.RIGHT] == C.DOOR) choices.push(C.RIGHT)
+            //let choices = []
+            //if(heroRoom.doors[C.TOP] == C.DOOR) choices.push(C.TOP)
+            //if(heroRoom.doors[C.BOTTOM] == C.DOOR) choices.push(C.BOTTOM)
+            //if(heroRoom.doors[C.LEFT] == C.DOOR) choices.push(C.LEFT)
+            //if(heroRoom.doors[C.RIGHT] == C.DOOR) choices.push(C.RIGHT)
+            //let choice = choices[Math.floor(Math.random() * choices.length)];
 
-            let choice = choices[Math.floor(Math.random() * choices.length)];
+            //positive right, negative left
+            let vectorX = this.scene.playerRoom.column - this.scene.heroRoom.column
+            //positive below, negative above
+            let vectorY = this.scene.playerRoom.row - this.scene.heroRoom.row
+            
+            let choice = undefined
+            if(Math.abs(vectorX) > Math.abs(vectorY)){
+                //left right
+                if(vectorX < 0 && heroRoom.doors[C.LEFT] == C.DOOR){
+                    choice = C.LEFT
+                }else if(heroRoom.doors[C.RIGHT] == C.DOOR){
+                    choice = C.RIGHT
+                }
+            }
+            if(choice == undefined){
+                //up down
+                if(vectorY < 0 && heroRoom.doors[C.TOP] == C.DOOR){
+                    choice = C.TOP
+                }else if(heroRoom.doors[C.BOTTOM] == C.DOOR){
+                    choice = C.BOTTOM
+                }                
+            }
+            
             if(choice == C.TOP){
                 this.door = C.TOP;
                 return dungeon.getRoom(heroRoom.column, heroRoom.row - 1)

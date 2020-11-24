@@ -29,3 +29,5 @@ export const BOTTOM = 3
 export const WALL = 0
 export const DOOR = 1
 export const UNKNOWN = -1
+
+export const DOOR_PROBABILITY = 0.4

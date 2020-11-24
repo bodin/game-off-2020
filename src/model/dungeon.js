@@ -58,13 +58,12 @@ class Dungeon {
 
     static createRoom(id, col, row, doors=[C.UNKNOWN,C.UNKNOWN,C.UNKNOWN,C.UNKNOWN]){
         const result = new Room(id, col, row);
-        const door_probability = .5
         result.doors = [...doors]
         
-        if(doors[C.TOP] == C.UNKNOWN)       result.doors[0] = Math.random() > door_probability ? C.WALL : C.DOOR
-        if(doors[C.LEFT] == C.UNKNOWN)      result.doors[1] = Math.random() > door_probability ? C.WALL : C.DOOR
-        if(doors[C.RIGHT] == C.UNKNOWN)     result.doors[2] = Math.random() > door_probability ? C.WALL : C.DOOR
-        if(doors[C.BOTTOM] == C.UNKNOWN)    result.doors[3] = Math.random() > door_probability ? C.WALL : C.DOOR
+        if(doors[C.TOP] == C.UNKNOWN)       result.doors[0] = Math.random() > C.DOOR_PROBABILITY ? C.WALL : C.DOOR
+        if(doors[C.LEFT] == C.UNKNOWN)      result.doors[1] = Math.random() > C.DOOR_PROBABILITY ? C.WALL : C.DOOR
+        if(doors[C.RIGHT] == C.UNKNOWN)     result.doors[2] = Math.random() > C.DOOR_PROBABILITY ? C.WALL : C.DOOR
+        if(doors[C.BOTTOM] == C.UNKNOWN)    result.doors[3] = Math.random() > C.DOOR_PROBABILITY ? C.WALL : C.DOOR
 
         return result
     }

@@ -56,26 +56,31 @@ export default class DungeonScene extends Scene {
         this.hero = new Hero(this, 200, 200, 'hero');
         this.physics.add.collider(this.hero, this.dungeonLayer);
 
-        this.physics.add.collider(this.player, this.hero, function (player, hero) {
-            if (!this.isGameOver) {
-                player.canMove = false
-                hero.canMove = false
-                hero.alpha=0.2
-                player.play("player-explode");
-                player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
-                    player.setFrame(14);
-                });
-                this.isGameOver = true;
-            }
-        });
+        this.physics.add.collider(this.player, this.hero, this.heDead.bind(this));
       
         this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
 
         this.cameras.main.fadeIn(1000, 0, 0, 0)        
     }
+    heDead(player, hero){
+        if (!this.isGameOver) {
+            player.canMove = false
+            hero.canMove = false
+            hero.alpha=0.2
+            player.play("player-explode");
+            player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, (() => {
+                player.setFrame(14);              
+                this.cameras.main.fadeOut(1000, 0, 0, 0)
+                        
+                this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+                    this.scene.start('dead-scene')
+                })
+            }).bind(this));
+            this.isGameOver = true;
+        }        
+    }
 
     update(){
-
         this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
         this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
 
@@ -91,7 +96,7 @@ export default class DungeonScene extends Scene {
     changeRoomAnimimation(){
         let room = this.playerRoom
 
-        this.cameras.main.fadeOut(250, 0, 0, 0, function(camera, progress) {
+        this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
             this.player.canMove = false
             if (progress === 1) {
                 this.heroRoom = this.hero.nextRoom(this.dungeon, this.playerRoom, this.heroRoom)
@@ -107,7 +112,7 @@ export default class DungeonScene extends Scene {
                     true)
 
                 // Fade back in with new boundareis.
-                this.cameras.main.fadeIn(100, 0, 0, 0, function(camera, progress) {
+                this.cameras.main.fadeIn(100, 0, 0, 0, (camera, progress) => {
                     if (progress === 1) {
                         this.player.canMove = true
                     }
@@ -139,7 +144,6 @@ export default class DungeonScene extends Scene {
         return this.dungeon.rooms[roomNumber]
     }
     
-
     makeDungeonTiles(dungeon, width, height){
         const tiles = new Array(dungeon.getRows() * height)
         for(let i = 0; i < tiles.length; i++){

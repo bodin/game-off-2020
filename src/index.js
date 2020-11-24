@@ -1,6 +1,8 @@
 import 'phaser';
+import scene_dead from './scene/dead'
 import scene_start from './scene/start'
 import scene_dungeon from './scene/dungeon'
+
 
 import * as C from './model/constants'
 
@@ -10,7 +12,7 @@ window.onload = () => {
         width: C.SCREEN_WIDTH,
         height: C.SCREEN_HEIGHT,
         pixelArt: true,
-        scene: [scene_start, scene_dungeon],
+        scene: [new scene_start(), scene_dungeon, new scene_dead()],
         physics: {
             default: "arcade",
             arcade: {             

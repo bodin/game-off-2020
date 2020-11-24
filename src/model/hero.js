@@ -1,6 +1,4 @@
-    
-    
-import * as C from './constants'
+  import * as C from './constants'
 
 export default class Hero extends Phaser.Physics.Arcade.Sprite {
 
@@ -69,7 +67,6 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityY(-1 * (this.y - playerY))
             this.play("hero-walk-up", true)
             this.skipNextRoom = true
-            console.log(-1 * (this.x - playerX), -1 * (this.y - playerY))
         }        
     }
 

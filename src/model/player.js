@@ -16,7 +16,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.setScale(2);
                           
-        this.velocity = 200
         this.canMove = true;     
         
         this.scene.anims.create({
@@ -47,9 +46,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if(!this.canMove) return
         
         if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
-            this.velocity = 500
+            this.velocity = 700
         }else{
-            this.velocity = 200
+            this.velocity = 300
         }
 
         let cursors = this.scene.input.keyboard.createCursorKeys()

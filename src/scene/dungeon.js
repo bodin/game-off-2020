@@ -17,7 +17,7 @@ export default class DungeonScene extends Scene {
     }
 
     preload () {        
-        this.load.image("tiles", "./assets/tileset/default.png")
+        this.load.image("tiles", "./assets/tileset/dungeon.png")
         this.load.spritesheet("player", "./assets/player.png", {
             frameWidth: 32,
             frameHeight: 32
@@ -184,7 +184,7 @@ export default class DungeonScene extends Scene {
 
         const tile_index = [
             [TILE.CORNER_TOP_LEFT,TILE.WALL_TOP,TILE.CORNER_TOP_RIGHT],
-            [TILE.WALL_RIGHT,TILE.BLANK,TILE.WALL_RIGHT],
+            [TILE.WALL_LEFT,TILE.BLANK,TILE.WALL_RIGHT],
             [TILE.CORNER_BOTTOM_LEFT,TILE.WALL_BOTTOM,TILE.CORNER_BOTTOM_RIGHT],            
         ]
 
@@ -199,6 +199,13 @@ export default class DungeonScene extends Scene {
             
             for(let k = 1; k < width-1; k++){            
                 tiles[i][k] = tile_index[tileRow][1]
+                if(i != 0 && i != height-1 && Math.random() > 0.7){
+                    if(Math.random() > 0.95){
+                        tiles[i][k] = TILE.BLANK_SPECIAL
+                    }else{
+                        tiles[i][k] = TILE.BLANK_TEXTURE
+                    }
+                }
             }
 
             tiles[i][width-1] = tile_index[tileRow][2]                    

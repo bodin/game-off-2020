@@ -1,5 +1,5 @@
 export default {
-    BLANK : -1,
+    BLANK : 1,
     CORNER_TOP_LEFT : 11,
     CORNER_TOP_RIGHT : 15,
     CORNER_BOTTOM_LEFT : 111,

@@ -35,7 +35,16 @@ export default class DungeonScene extends Scene {
         const dungeonTileMap = this.make.tilemap({ data: dungeonTiles, tileWidth: C.TILE_WIDTH, tileHeight: C.TILE_HEIGHT });
         const tiles = dungeonTileMap.addTilesetImage("tiles");        
         this.dungeonLayer = dungeonTileMap.createStaticLayer(0, tiles, 0, 0);
-        this.dungeonLayer.setCollisionBetween(1, 115);
+        this.dungeonLayer.setCollision([
+            TILE.CORNER_TOP_LEFT,
+            TILE.CORNER_BOTTOM_LEFT,
+            TILE.CORNER_TOP_RIGHT,
+            TILE.CORNER_BOTTOM_RIGHT,
+            TILE.WALL_BOTTOM,
+            TILE.WALL_TOP,
+            TILE.WALL_LEFT,
+            TILE.WALL_RIGHT,
+        ]);
 
         this.dungeonContainer = this.add.container(C.ROOM_WIDTH, C.ROOM_HEIGHT);
         this.dungeonContainer.add(this.dungeonLayer)

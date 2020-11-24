@@ -199,7 +199,7 @@ export default class DungeonScene extends Scene {
             
             for(let k = 1; k < width-1; k++){            
                 tiles[i][k] = tile_index[tileRow][1]
-                if(i != 0 && i != height-1 && Math.random() > 0.7){
+                if(i != 0 && i != height-1 && Math.random() > 0.9){
                     if(Math.random() > 0.95){
                         tiles[i][k] = TILE.BLANK_SPECIAL
                     }else{

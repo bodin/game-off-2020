@@ -48,9 +48,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if(!this.canMove) return
         
         if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
-            this.velocity = C.SPEED_PLAYER_RUNNING
+            this.velocity = C.PLAYER_SPEED_RUNNING
         }else{
-            this.velocity = C.SPEED_PLAYER_WALKING
+            this.velocity = C.PLAYER_SPEED_WALKING
         }
 
         let cursors = this.scene.input.keyboard.createCursorKeys()

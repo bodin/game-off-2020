@@ -144,7 +144,7 @@ export default class DungeonScene extends Scene {
             }
             if(!this.heroTimerCrazy){
                 this.heroTimerCrazy = this.time.addEvent({
-                    delay: C.SPEED_HERO_ROOM_SWITCH_CRAZY,
+                    delay: C.HERO_SPEED_ROOM_SWITCH_CRAZY,
                     callback: this.heroNextRoom,
                     callbackScope: this,
                     loop: true
@@ -154,7 +154,7 @@ export default class DungeonScene extends Scene {
         }else if(2*this.pillars.size < C.PILLARS) {
             if(!this.heroTimer){
                 this.heroTimer = this.time.addEvent({
-                    delay: C.SPEED_HERO_ROOM_SWITCH_NORMAL,                
+                    delay: C.HERO_SPEED_ROOM_SWITCH_NORMAL,                
                     callback: this.heroNextRoom,
                     callbackScope: this,
                     loop: true

@@ -54,10 +54,10 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             let offsetY = C.ROOM_HEIGHT/2
 
             if(this.door != C.UNKNOWN){            
-                if(this.door == C.TOP) offsetY = C.ROOM_HEIGHT
-                else if(this.door == C.BOTTOM) offsetY = 0
-                else if(this.door == C.LEFT) offsetX = C.ROOM_WIDTH
-                else if(this.door == C.RIGHT) offsetX = 0
+                if(this.door == C.TOP) offsetY = C.ROOM_HEIGHT + C.HERO_DOOR_OFFSET
+                else if(this.door == C.BOTTOM) offsetY = -C.HERO_DOOR_OFFSET
+                else if(this.door == C.LEFT) offsetX = C.ROOM_WIDTH + C.HERO_DOOR_OFFSET
+                else if(this.door == C.RIGHT) offsetX = -C.HERO_DOOR_OFFSET
             }
 
             this.setX((C.ROOM_WIDTH * room.column) + offsetX)
@@ -72,7 +72,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             vectorX = vectorX/normal
             vectorY = vectorY/normal
 
-            this.setVelocity(C.SPEED_HERO_RUNNING*vectorX, C.SPEED_HERO_RUNNING*vectorY)
+            this.setVelocity(C.HERO_SPEED_RUNNING*vectorX, C.HERO_SPEED_RUNNING*vectorY)
 
             this.play("hero-walk-up", true)
             this.skipNextRoom = true
@@ -86,7 +86,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         if(heroRoom.doors[C.BOTTOM] == C.DOOR) choices.push(C.BOTTOM)
         if(heroRoom.doors[C.LEFT] == C.DOOR) choices.push(C.LEFT)
         if(heroRoom.doors[C.RIGHT] == C.DOOR) choices.push(C.RIGHT)
-        let choice = choices[Math.floor(Math.random() * choices.length)];
+        let choice = choices[Math.floor(Math.random() * (choices.length+1))];
         
         if(choice == C.TOP){
             this.door = C.TOP;

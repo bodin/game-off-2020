@@ -79,56 +79,83 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         }        
     }
 
+    nextRoomRandom(){
+
+        let choices = []
+        if(heroRoom.doors[C.TOP] == C.DOOR) choices.push(C.TOP)
+        if(heroRoom.doors[C.BOTTOM] == C.DOOR) choices.push(C.BOTTOM)
+        if(heroRoom.doors[C.LEFT] == C.DOOR) choices.push(C.LEFT)
+        if(heroRoom.doors[C.RIGHT] == C.DOOR) choices.push(C.RIGHT)
+        let choice = choices[Math.floor(Math.random() * choices.length)];
+        
+        if(choice == C.TOP){
+            this.door = C.TOP;
+            return dungeon.getRoom(heroRoom.column, heroRoom.row - 1)
+        } else if(choice == C.BOTTOM){
+            this.door = C.BOTTOM;
+            return dungeon.getRoom(heroRoom.column, heroRoom.row + 1)
+        } else if(choice == C.LEFT){
+            this.door = C.LEFT;
+            return dungeon.getRoom(heroRoom.column-1, heroRoom.row)
+        } else if(choice == C.RIGHT){
+            this.door = C.RIGHT;
+            return dungeon.getRoom(heroRoom.column+1, heroRoom.row)
+        } 
+    
+        return heroRoom
+    }
+
+    nextRoomVector(dungeon, playerRoom, heroRoom) {
+
+        //positive right, negative left
+        let vectorX = this.scene.playerRoom.column - this.scene.heroRoom.column
+        //positive below, negative above
+        let vectorY = this.scene.playerRoom.row - this.scene.heroRoom.row
+        
+        let choice = undefined
+        if(Math.abs(vectorX) >= Math.abs(vectorY)){
+            //left right
+            if(vectorX < 0 && heroRoom.doors[C.LEFT] == C.DOOR){
+                choice = C.LEFT
+            }else if(heroRoom.doors[C.RIGHT] == C.DOOR){
+                choice = C.RIGHT
+            }
+        }
+        if(choice == undefined){
+            //up down
+            if(vectorY < 0 && heroRoom.doors[C.TOP] == C.DOOR){
+                choice = C.TOP
+            }else if(heroRoom.doors[C.BOTTOM] == C.DOOR){
+                choice = C.BOTTOM
+            }                
+        }
+        
+        if(choice == C.TOP){
+            this.door = C.TOP;
+            return dungeon.getRoom(heroRoom.column, heroRoom.row - 1)
+        } else if(choice == C.BOTTOM){
+            this.door = C.BOTTOM;
+            return dungeon.getRoom(heroRoom.column, heroRoom.row + 1)
+        } else if(choice == C.LEFT){
+            this.door = C.LEFT;
+            return dungeon.getRoom(heroRoom.column-1, heroRoom.row)
+        } else if(choice == C.RIGHT){
+            this.door = C.RIGHT;
+            return dungeon.getRoom(heroRoom.column+1, heroRoom.row)
+        } 
+        
+        return heroRoom
+    }
+
     nextRoom(dungeon, playerRoom, heroRoom) {
         this.door = C.UNKNOWN
 
-        if(!this.skipNextRoom){
-            //let choices = []
-            //if(heroRoom.doors[C.TOP] == C.DOOR) choices.push(C.TOP)
-            //if(heroRoom.doors[C.BOTTOM] == C.DOOR) choices.push(C.BOTTOM)
-            //if(heroRoom.doors[C.LEFT] == C.DOOR) choices.push(C.LEFT)
-            //if(heroRoom.doors[C.RIGHT] == C.DOOR) choices.push(C.RIGHT)
-            //let choice = choices[Math.floor(Math.random() * choices.length)];
-
-            //positive right, negative left
-            let vectorX = this.scene.playerRoom.column - this.scene.heroRoom.column
-            //positive below, negative above
-            let vectorY = this.scene.playerRoom.row - this.scene.heroRoom.row
-            
-            let choice = undefined
-            if(Math.abs(vectorX) >= Math.abs(vectorY)){
-                //left right
-                if(vectorX < 0 && heroRoom.doors[C.LEFT] == C.DOOR){
-                    choice = C.LEFT
-                }else if(heroRoom.doors[C.RIGHT] == C.DOOR){
-                    choice = C.RIGHT
-                }
-            }
-            if(choice == undefined){
-                //up down
-                if(vectorY < 0 && heroRoom.doors[C.TOP] == C.DOOR){
-                    choice = C.TOP
-                }else if(heroRoom.doors[C.BOTTOM] == C.DOOR){
-                    choice = C.BOTTOM
-                }                
-            }
-
-            
-            if(choice == C.TOP){
-                this.door = C.TOP;
-                return dungeon.getRoom(heroRoom.column, heroRoom.row - 1)
-            } else if(choice == C.BOTTOM){
-                this.door = C.BOTTOM;
-                return dungeon.getRoom(heroRoom.column, heroRoom.row + 1)
-            } else if(choice == C.LEFT){
-                this.door = C.LEFT;
-                return dungeon.getRoom(heroRoom.column-1, heroRoom.row)
-            } else if(choice == C.RIGHT){
-                this.door = C.RIGHT;
-                return dungeon.getRoom(heroRoom.column+1, heroRoom.row)
-            } 
+        if(this.skipNextRoom){
+            this.skipNextRoom = false
+            return heroRoom            
         }
-        this.skipNextRoom = false
-        return heroRoom
+        
+        return this.nextRoomVector(dungeon, playerRoom, heroRoom)
+        
     }
 }

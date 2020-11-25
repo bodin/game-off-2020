@@ -30,5 +30,5 @@ export const WALL = 0
 export const DOOR = 1
 export const UNKNOWN = -1
 
-export const DOOR_PROBABILITY = 0.9
-export const PILLARS = 4
+export const DOOR_PROBABILITY = 0.75
+export const PILLARS = 5

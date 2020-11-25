@@ -74,8 +74,12 @@ export default class DungeonScene extends Scene {
 
         this.pillars = new Map()
         for(let i = 0; i < C.PILLARS; i++){
-            let pillar = new Pillar(this, 'pillar', this.dungeon.getRoom(i,i));
-            this.pillars.set(pillar.room.id, pillar)
+            let room = this.dungeon.getRoom(Math.floor((C.COLUMNS-1) * Math.random()), Math.floor((C.ROWS-1) * Math.random()))
+            while(this.pillars.has(room.id)){
+                room = this.dungeon.getRoom(Math.floor((C.COLUMNS-1) * Math.random()), Math.floor((C.ROWS-1) * Math.random()))
+            }
+            let pillar = new Pillar(this, 'pillar', room);
+            this.pillars.set(room.id, pillar)
             this.physics.add.collider(this.player, pillar, this.crumble.bind(this));
         }
         this.cameras.main.fadeIn(1000, 0, 0, 0)

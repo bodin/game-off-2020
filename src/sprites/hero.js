@@ -79,7 +79,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         }        
     }
 
-    nextRoomRandom(){
+    nextRoomRandom(dungeon, playerRoom, heroRoom){
 
         let choices = []
         if(heroRoom.doors[C.TOP] == C.DOOR) choices.push(C.TOP)
@@ -108,16 +108,17 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
     nextRoomVector(dungeon, playerRoom, heroRoom) {
 
         //positive right, negative left
-        let vectorX = this.scene.playerRoom.column - this.scene.heroRoom.column
+        let vectorX = playerRoom.column - this.scene.heroRoom.column
         //positive below, negative above
-        let vectorY = this.scene.playerRoom.row - this.scene.heroRoom.row
+        let vectorY = playerRoom.row - this.scene.heroRoom.row
         
         let choice = undefined
+        
         if(Math.abs(vectorX) >= Math.abs(vectorY)){
             //left right
             if(vectorX < 0 && heroRoom.doors[C.LEFT] == C.DOOR){
                 choice = C.LEFT
-            }else if(heroRoom.doors[C.RIGHT] == C.DOOR){
+            }else if(vectorX > 0 && heroRoom.doors[C.RIGHT] == C.DOOR){
                 choice = C.RIGHT
             }
         }
@@ -125,7 +126,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             //up down
             if(vectorY < 0 && heroRoom.doors[C.TOP] == C.DOOR){
                 choice = C.TOP
-            }else if(heroRoom.doors[C.BOTTOM] == C.DOOR){
+            }else if(vectorY > 0 && heroRoom.doors[C.BOTTOM] == C.DOOR){
                 choice = C.BOTTOM
             }                
         }
@@ -142,6 +143,8 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         } else if(choice == C.RIGHT){
             this.door = C.RIGHT;
             return dungeon.getRoom(heroRoom.column+1, heroRoom.row)
+        }else{
+            return this.nextRoomRandom(dungeon, playerRoom, heroRoom)
         } 
         
         return heroRoom
@@ -154,7 +157,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.skipNextRoom = false
             return heroRoom            
         }
-        
+
         return this.nextRoomVector(dungeon, playerRoom, heroRoom)
         
     }

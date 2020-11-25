@@ -32,6 +32,10 @@ export default class DungeonScene extends Scene {
     }
 
     create () {
+        this.gameOver = undefined
+        this.heroRoom = undefined
+        this.gameOver = undefined
+
         this.dungeon = Dungeon.create('foo', C.COLUMNS, C.ROWS);                
         let dungeonTiles = this.makeDungeonTiles(this.dungeon, C.ROOM_TILE_WIDTH, C.ROOM_TILE_HEIGHT)
 
@@ -97,10 +101,10 @@ export default class DungeonScene extends Scene {
         }
     }
     heDead(player, hero){
-        if (!this.isGameOver) {
+        if (!this.gameOver) {
             player.canMove = false
             hero.canMove = false
-            hero.alpha=0.2
+            hero.alpha = 0.2
             player.play("player-explode");
             player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, (() => {
                 player.setFrame(14);              
@@ -110,7 +114,7 @@ export default class DungeonScene extends Scene {
                     this.scene.start('dead-scene')
                 })
             }).bind(this));
-            this.isGameOver = true;
+            this.gameOver = true;
         }        
     }
 

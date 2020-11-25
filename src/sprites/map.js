@@ -11,6 +11,7 @@ export default class MapSprite extends Phaser.GameObjects.Container {
 
         scene.add.existing(this);
 
+        this.scene.textures.remove('map') 
         this.makeMapGraphic('map', scene.dungeon, C.MAP_WIDTH, C.MAP_HEIGHT)
         this.makeMarkerSprite('boss-marker', MARKER_SIZE, 0xff0000)
         this.makeMarkerSprite('player-marker', MARKER_SIZE, 0x00ff00)

@@ -20,9 +20,22 @@ export default class MapSprite extends Phaser.GameObjects.Container {
 
         this.map = this.scene.make.sprite({x:0,y:0,key:'map'}).setOrigin(0,0)
         this.hero = this.scene.make.sprite({x:_x,y:_y,key:'boss-marker'}).setOrigin(0,0)
-        this.player = this.scene.make.sprite({x:_x,y:_y,key:'player-marker'}).setOrigin(0,0)        
+        this.player = this.scene.make.sprite({x:_x,y:_y,key:'player-marker'}).setOrigin(0,0)
 
-        this.add(this.map).add(this.hero).add(this.player)
+        this.pillars = []
+
+        let distance = (C.MAP_WIDTH - C.MAP_SPACER*2) / this.scene.pillars.size
+        _y = C.MAP_SPACER + C.MAP_HEIGHT
+
+        for(let i = 0; i < C.PILLARS; i++){
+            _x = C.MAP_SPACER + (i * distance) +  distance/2 - (MARKER_SIZE/2)
+
+            this.scene.textures.remove('pillar-marker-' + i) 
+            this.makeMarkerSprite('pillar-marker-' + i, MARKER_SIZE, 0xffffff)
+            this.pillars.push(this.scene.make.sprite({x:_x,y:_y,key:'pillar-marker-' + i}).setOrigin(0,0).setAlpha(.25))           
+        }
+        this.add(this.map).add(this.hero).add(this.player).add(this.pillars)
+       
 
         this.playerId = undefined
         this.heroId = undefined
@@ -33,6 +46,12 @@ export default class MapSprite extends Phaser.GameObjects.Container {
         
         this.setX(this.scene.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER)
         this.setY(this.scene.cameras.main.worldView.y + C.MAP_SPACER)
+
+        for(let i = 0; i < this.pillars.length; i++){
+            if(i < C.PILLARS - this.scene.pillars.size){
+                this.pillars[i].setAlpha(1)
+            }
+        }
 
         let heroRoom = this.scene.heroRoom
         if(this.heroId != heroRoom.id) {

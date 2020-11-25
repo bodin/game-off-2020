@@ -10,8 +10,8 @@ export const ROOM_TILE_HEIGHT = 25
 export const ROOM_WIDTH = TILE_WIDTH * ROOM_TILE_WIDTH
 export const ROOM_HEIGHT = TILE_HEIGHT * ROOM_TILE_HEIGHT
 
-export const COLUMNS = 3
-export const ROWS = 3
+export const COLUMNS = 5
+export const ROWS = 5
 
 export const MAP_WIDTH = 180
 export const MAP_HEIGHT = 180
@@ -30,5 +30,5 @@ export const WALL = 0
 export const DOOR = 1
 export const UNKNOWN = -1
 
-export const DOOR_PROBABILITY = 0.85
+export const DOOR_PROBABILITY = 0.9
 export const PILLARS = 4

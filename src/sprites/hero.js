@@ -1,4 +1,4 @@
-  import * as C from './constants'
+  import * as C from '../model/constants'
 
 export default class Hero extends Phaser.Physics.Arcade.Sprite {
 

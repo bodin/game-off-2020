@@ -1,9 +1,9 @@
-import {TOP, BOTTOM, LEFT, RIGHT, WALL} from './dungeon'
-import * as C from './constants'
+import {TOP, BOTTOM, LEFT, RIGHT, WALL} from '../model/dungeon'
+import * as C from '../model/constants'
 
 const MARKER_SIZE=20
 
-export default class Map extends Phaser.GameObjects.Container {
+export default class MapSprite extends Phaser.GameObjects.Container {
 
     constructor(scene, x, y) {
         super(scene);

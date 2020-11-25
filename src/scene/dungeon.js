@@ -1,9 +1,10 @@
 import {Scene} from 'phaser'
 import TILE from '../model/tiles'
-import Player from '../model/player'
-import Hero from '../model/hero'
+import Player from '../sprites/player'
+import Hero from '../sprites/hero'
+import Pillar from '../sprites/pillar'
 
-import Map from '../model/map'
+import MapSprite from '../sprites/map'
 import {Dungeon, TOP, BOTTOM, LEFT, RIGHT, DOOR} from '../model/dungeon'
 import * as C from '../model/constants'
 
@@ -18,6 +19,8 @@ export default class DungeonScene extends Scene {
 
     preload () {        
         this.load.image("tiles", "./assets/tileset/dungeon.png")
+        this.load.image("pillar", "./assets/pillar.png")
+
         this.load.spritesheet("player", "./assets/player.png", {
             frameWidth: 32,
             frameHeight: 32
@@ -67,9 +70,27 @@ export default class DungeonScene extends Scene {
 
         this.physics.add.collider(this.player, this.hero, this.heDead.bind(this));
       
-        this.map = new Map(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
+        this.map = new MapSprite(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
 
-        this.cameras.main.fadeIn(1000, 0, 0, 0)        
+        this.pillars = new Map()
+        for(let i = 0; i < C.PILLARS; i++){
+            let pillar = new Pillar(this, 'pillar', this.dungeon.getRoom(i,i));
+            this.pillars.set(pillar.room.id, pillar)
+            this.physics.add.collider(this.player, pillar, this.crumble.bind(this));
+        }
+        this.cameras.main.fadeIn(1000, 0, 0, 0)
+
+    }
+    crumble(player, pillar){
+        this.pillars.delete(pillar.room.id)
+        pillar.destroy()
+        if(this.pillars.size == 0){
+            this.cameras.main.fadeOut(1000, 0, 0, 0)
+            
+            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+                this.scene.start('win-scene')
+            })
+        }
     }
     heDead(player, hero){
         if (!this.isGameOver) {

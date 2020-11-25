@@ -30,5 +30,11 @@ export const WALL = 0
 export const DOOR = 1
 export const UNKNOWN = -1
 
-export const DOOR_PROBABILITY = 0.75
+export const DOOR_PROBABILITY = 0.8
 export const PILLARS = 5
+
+export const SPEED_HERO_RUNNING = 510
+export const SPEED_HERO_ROOM_SWITCH_NORMAL = 1000
+export const SPEED_HERO_ROOM_SWITCH_CRAZY = 500
+export const SPEED_PLAYER_WALKING = 300
+export const SPEED_PLAYER_RUNNING = 500

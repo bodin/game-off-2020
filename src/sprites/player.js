@@ -1,3 +1,5 @@
+import * as C from '../model/constants'
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     /**
@@ -46,9 +48,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if(!this.canMove) return
         
         if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
-            this.velocity = 700
+            this.velocity = C.SPEED_PLAYER_RUNNING
         }else{
-            this.velocity = 300
+            this.velocity = C.SPEED_PLAYER_WALKING
         }
 
         let cursors = this.scene.input.keyboard.createCursorKeys()

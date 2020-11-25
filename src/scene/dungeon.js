@@ -88,8 +88,12 @@ export default class DungeonScene extends Scene {
         this.map = new MapSprite(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
 
         this.cameras.main.fadeIn(1000, 0, 0, 0)
-
     }
+
+    heroNextRoom() {        
+        this.heroRoom = this.hero.nextRoom(this.dungeon, this.playerRoom, this.heroRoom)        
+    }
+
     crumble(player, pillar){
         this.pillars.delete(pillar.room.id)
         pillar.destroy()
@@ -99,6 +103,8 @@ export default class DungeonScene extends Scene {
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
                 this.scene.start('win-scene')
             })
+        } else{
+            this.checkHeroNextRoom(false)
         }
     }
     heDead(player, hero){
@@ -131,6 +137,33 @@ export default class DungeonScene extends Scene {
             this.map.change=true
         }
     }
+    checkHeroNextRoom(force){
+        if(this.pillars.length == 1){
+            if(this.heroTimer){
+                this.heroTimer.remove();
+            }
+            if(!this.heroTimerCrazy){
+                this.heroTimerCrazy = this.time.addEvent({
+                    delay: C.SPEED_HERO_ROOM_SWITCH_CRAZY,
+                    callback: this.heroNextRoom,
+                    callbackScope: this,
+                    loop: true
+                });                 
+            }
+
+        }else if(2*this.pillars.size < C.PILLARS) {
+            if(!this.heroTimer){
+                this.heroTimer = this.time.addEvent({
+                    delay: C.SPEED_HERO_ROOM_SWITCH_NORMAL,                
+                    callback: this.heroNextRoom,
+                    callbackScope: this,
+                    loop: true
+                });                 
+            }   
+        }else if(force){
+            this.heroNextRoom(); 
+        }
+    }
 
     changeRoomAnimimation(){
         let room = this.playerRoom
@@ -138,7 +171,8 @@ export default class DungeonScene extends Scene {
         this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
             this.player.canMove = false
             if (progress === 1) {
-                this.heroRoom = this.hero.nextRoom(this.dungeon, this.playerRoom, this.heroRoom)
+                
+                this.checkHeroNextRoom(true);
 
                 this.maskShape.x = room.column * C.ROOM_WIDTH
                 this.maskShape.y = room.row * C.ROOM_HEIGHT

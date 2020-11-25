@@ -1,4 +1,4 @@
-  import * as C from '../model/constants'
+import * as C from '../model/constants'
 
 export default class Hero extends Phaser.Physics.Arcade.Sprite {
 
@@ -72,7 +72,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             vectorX = vectorX/normal
             vectorY = vectorY/normal
 
-            this.setVelocity(500*vectorX, 500*vectorY)
+            this.setVelocity(C.SPEED_HERO_RUNNING*vectorX, C.SPEED_HERO_RUNNING*vectorY)
 
             this.play("hero-walk-up", true)
             this.skipNextRoom = true
@@ -158,7 +158,11 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             return heroRoom            
         }
 
-        return this.nextRoomVector(dungeon, playerRoom, heroRoom)
+        if(this.scene.pillars.size == C.PILLARS){
+            return this.nextRoomRandom(dungeon, playerRoom, heroRoom)
+        } else{ 
+            return this.nextRoomVector(dungeon, playerRoom, heroRoom)
+        }
         
     }
 }

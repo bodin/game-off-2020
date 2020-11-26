@@ -12,8 +12,6 @@ export default class DungeonScene extends Scene {
    
     constructor() {        
         super('dungeon-scene')
-        this.playerRoom = undefined
-        this.heroRoom = undefined
         this.gameOver = undefined
     }
 
@@ -32,8 +30,8 @@ export default class DungeonScene extends Scene {
     }
 
     create () {
-        this.gameOver = undefined
-        this.heroRoom = undefined
+        
+        this.render = false
         this.gameOver = undefined
 
         this.dungeon = Dungeon.create('foo', C.COLUMNS, C.ROWS);                
@@ -64,12 +62,10 @@ export default class DungeonScene extends Scene {
 
         this.dungeonContainer.setMask(this.maskShape.createGeometryMask());
 
-        this.playerRoom = this.dungeon.getRoom(0, 0)   
-        this.player = new Player(this, 200, 200, 'player');        
+        this.player = new Player(this, 200, 200, 'player', this.dungeon.getRoom(0, 0));        
         this.physics.add.collider(this.player, this.dungeonLayer);
-
-        this.heroRoom = this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1)   
-        this.hero = new Hero(this, 200, 200, 'hero');
+        
+        this.hero = new Hero(this, 200, 200, 'hero', this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1));
         this.physics.add.collider(this.hero, this.dungeonLayer);
 
         this.physics.add.collider(this.player, this.hero, this.heDead.bind(this));
@@ -86,12 +82,12 @@ export default class DungeonScene extends Scene {
         }
 
         this.map = new MapSprite(this, C.ROOM_WIDTH + C.MAP_SPACER, C.MAP_SPACER)
-
+        this.render = true
         this.cameras.main.fadeIn(1000, 0, 0, 0)
     }
 
     heroNextRoom() {        
-        this.heroRoom = this.hero.nextRoom(this.dungeon, this.playerRoom, this.heroRoom)        
+        this.hero.switchRoom(this.dungeon, this.player.room)
     }
 
     crumble(player, pillar){
@@ -131,8 +127,8 @@ export default class DungeonScene extends Scene {
 
         let room = this.getCurrentRoom();
 
-        if(!this.playerRoom || this.playerRoom.id != room.id){
-            this.playerRoom = room        
+        if(!this.player.room || this.player.room.id != room.id){
+            this.player.room = room        
             this.changeRoomAnimimation()
             this.map.change=true
         }
@@ -166,7 +162,7 @@ export default class DungeonScene extends Scene {
     }
 
     changeRoomAnimimation(){
-        let room = this.playerRoom
+        let room = this.player.room
 
         this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
             this.player.canMove = false

@@ -9,7 +9,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * @param {number} y - Start location y value.
      * @param {number} [frame] -
      */
-    constructor(scene, x, y, texture) {
+    constructor(scene, x, y, texture, room) {
         super(scene, x, y, texture);
         this.scene = scene
         
@@ -17,9 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.add.existing(this);
 
         this.setScale(2);
-                          
-        this.canMove = true;     
-        
+                                         
         this.scene.anims.create({
             key: 'player-walk-up',
             frameRate:10,   
@@ -38,6 +36,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             frames: this.scene.anims.generateFrameNumbers(texture, { start: 5, end: 14 }),
             repeat: 0
         });     
+
+        //Custom Properties
+        this.canMove = true
+        this.room = room
     }
 
     preUpdate(time, delta){
@@ -45,9 +47,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         this.setVelocity(0, 0)       
 
-        if(!this.canMove) return
-        
-        if (this.scene.playerRoom.id == this.scene.heroRoom.id) {
+        if(!this.scene.render || !this.canMove) return
+
+        if (this.scene.player.room.id == this.scene.hero.room.id) {
             this.velocity = C.PLAYER_SPEED_RUNNING
         }else{
             this.velocity = C.PLAYER_SPEED_WALKING

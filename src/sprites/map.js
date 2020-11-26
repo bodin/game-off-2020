@@ -43,7 +43,9 @@ export default class MapSprite extends Phaser.GameObjects.Container {
     }
 
     preUpdate(time, delta){
-        
+
+        if(!this.scene.render) return
+
         this.setX(this.scene.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER)
         this.setY(this.scene.cameras.main.worldView.y + C.MAP_SPACER)
 
@@ -53,7 +55,7 @@ export default class MapSprite extends Phaser.GameObjects.Container {
             }
         }
 
-        let heroRoom = this.scene.heroRoom
+        let heroRoom = this.scene.hero.room
         if(this.heroId != heroRoom.id) {
             this.heroId = heroRoom.id
             this.scene.tweens.add({
@@ -66,7 +68,7 @@ export default class MapSprite extends Phaser.GameObjects.Container {
             })
         }
 
-        let playerRoom = this.scene.playerRoom
+        let playerRoom = this.scene.player.room
         if(this.playerId != playerRoom.id) {
             this.playerId = playerRoom.id
             this.scene.tweens.add({

@@ -88,46 +88,9 @@ class Dungeon {
         }
         
         while(roomGroups.length > 1){
-            let sizeBefore = roomGroups.length;
-            let groupToExpand = roomGroups[0]
-            let expanded = this.expandGroup(groupToExpand)            
-            for(let i = 1; i < roomGroups.length; i++){
-                let groupToCheck = roomGroups[i];
-                let intersection = new Set([...expanded.keys()].filter(x => groupToCheck.has(x)))
-                if(intersection.size > 0){
-                    
-                    roomGroups.splice(i, 1);
-                    roomGroups[0] = new Map([...roomGroups[0], ...groupToCheck])
-                    let selected = intersection.values().next().value;
-                    
-                    let room1 = expanded.get(selected);
-                    let room2 = allRoomMap.get(selected);
-                    
-                    if(room1 && room2){
-                        if(room1.column == room2.column){
-                            if(room1.row > room2.row){
-                                //room1 below room2
-                                room1.doors[C.TOP] = C.DOOR
-                                room2.doors[C.BOTTOM] = C.DOOR                            
-                            }else{
-                                //room1 above room2
-                                room1.doors[C.BOTTOM] = C.DOOR
-                                room2.doors[C.TOP] = C.DOOR
-                            }
-                        } else {
-                            if(room1.column > room2.column){
-                                //room1 right of room2
-                                room1.doors[C.LEFT] = C.DOOR
-                                room2.doors[C.RIGHT] = C.DOOR
-                            }else{
-                                //room1 left of room2
-                                room1.doors[C.RIGHT] = C.DOOR
-                                room2.doors[C.LEFT] = C.DOOR
-                            }
-                        }
-                    }
-                }
-            }
+            let sizeBefore = roomGroups.length;            
+
+            roomGroups = this.mergeGroups(allRoomMap, roomGroups)
             
             if(sizeBefore == roomGroups.length) {
                 console.log("Oops .... got some bad logic here")
@@ -136,6 +99,84 @@ class Dungeon {
         }
         return this
     }
+
+    adjustInternal(currentRoom, visitedRooms){
+        if(visitedRooms.has(currentRoom.id)) return visitedRooms;
+
+        visitedRooms.set(currentRoom.id, currentRoom);
+
+        if(currentRoom.doors[C.TOP] == C.DOOR) {
+            const nextRoom = this.getRoom(currentRoom.column, currentRoom.row-1);
+            if(nextRoom){
+                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
+            }
+        }
+        if(currentRoom.doors[C.BOTTOM] == C.DOOR) {
+            const nextRoom = this.getRoom(currentRoom.column, currentRoom.row+1);
+            if(nextRoom){
+                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
+            }
+        }
+        if(currentRoom.doors[C.LEFT] == C.DOOR) {
+            const nextRoom = this.getRoom(currentRoom.column-1, currentRoom.row);
+            if(nextRoom){
+                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
+            }
+        }
+        if(currentRoom.doors[C.RIGHT] == C.DOOR) {
+            const nextRoom = this.getRoom(currentRoom.column+1, currentRoom.row);
+            if(nextRoom){
+                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
+            }
+        }
+        return visitedRooms
+    }
+
+    mergeGroups(allRoomMap, roomGroups){
+        let groupToExpand = roomGroups[0]
+        let expanded = this.expandGroup(groupToExpand)
+
+        for(let i = 1; i < roomGroups.length; i++){
+            let groupToCheck = roomGroups[i];
+            let intersection = new Set([...expanded.keys()].filter(x => groupToCheck.has(x)))
+            
+            if(intersection.size > 0){
+                
+                roomGroups.splice(i, 1);
+                roomGroups[0] = new Map([...roomGroups[0], ...groupToCheck])
+                let selected = intersection.values().next().value;
+                
+                let room1 = expanded.get(selected);
+                let room2 = allRoomMap.get(selected);
+                
+                if(room1 && room2){
+                    if(room1.column == room2.column){
+                        if(room1.row > room2.row){
+                            //room1 below room2
+                            room1.doors[C.TOP] = C.DOOR
+                            room2.doors[C.BOTTOM] = C.DOOR                            
+                        }else{
+                            //room1 above room2
+                            room1.doors[C.BOTTOM] = C.DOOR
+                            room2.doors[C.TOP] = C.DOOR
+                        }
+                    } else {
+                        if(room1.column > room2.column){
+                            //room1 right of room2
+                            room1.doors[C.LEFT] = C.DOOR
+                            room2.doors[C.RIGHT] = C.DOOR
+                        }else{
+                            //room1 left of room2
+                            room1.doors[C.RIGHT] = C.DOOR
+                            room2.doors[C.LEFT] = C.DOOR
+                        }
+                    }
+                }
+            }
+        }
+        return roomGroups
+    }
+
     expandGroup(groupToExpand){
         let expanded = new Map()
         
@@ -167,37 +208,6 @@ class Dungeon {
             }
         }
         return expanded;
-    }
-    adjustInternal(currentRoom, visitedRooms){
-        if(visitedRooms.has(currentRoom.id)) return visitedRooms;
-
-        visitedRooms.set(currentRoom.id, currentRoom);
-
-        if(currentRoom.doors[C.TOP] == C.DOOR) {
-            const nextRoom = this.getRoom(currentRoom.column, currentRoom.row-1);
-            if(nextRoom){
-                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
-            }
-        }
-        if(currentRoom.doors[C.BOTTOM] == C.DOOR) {
-            const nextRoom = this.getRoom(currentRoom.column, currentRoom.row+1);
-            if(nextRoom){
-                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
-            }
-        }
-        if(currentRoom.doors[C.LEFT] == C.DOOR) {
-            const nextRoom = this.getRoom(currentRoom.column-1, currentRoom.row);
-            if(nextRoom){
-                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
-            }
-        }
-        if(currentRoom.doors[C.RIGHT] == C.DOOR) {
-            const nextRoom = this.getRoom(currentRoom.column+1, currentRoom.row);
-            if(nextRoom){
-                visitedRooms =  this.adjustInternal(nextRoom, visitedRooms);
-            }
-        }
-        return visitedRooms
     }
 }
 

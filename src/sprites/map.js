@@ -5,6 +5,13 @@ const MARKER_SIZE=20
 
 export default class MapSprite extends Phaser.GameObjects.Container {
 
+    /**
+     * Create the MapSprite
+     * 
+     * @param {*} scene 
+     * @param {*} x 
+     * @param {*} y 
+     */
     constructor(scene, x, y) {
         super(scene);
         this.scene = scene
@@ -42,6 +49,12 @@ export default class MapSprite extends Phaser.GameObjects.Container {
         
     }
 
+    /**
+     * Called once before the scene updates
+     * 
+     * @param {*} time 
+     * @param {*} delta 
+     */
     preUpdate(time, delta){
 
         if(!this.scene.render) return
@@ -54,9 +67,10 @@ export default class MapSprite extends Phaser.GameObjects.Container {
                 this.pillars[i].setAlpha(1)
             }
         }
-
+        
         let heroRoom = this.scene.hero.room
         if(this.heroId != heroRoom.id) {
+            // the hero moved, remember their location and update the marker
             this.heroId = heroRoom.id
             this.scene.tweens.add({
                 targets: this.hero, 
@@ -70,6 +84,7 @@ export default class MapSprite extends Phaser.GameObjects.Container {
 
         let playerRoom = this.scene.player.room
         if(this.playerId != playerRoom.id) {
+            //the player moved, remember their location and update the marker
             this.playerId = playerRoom.id
             this.scene.tweens.add({
                            targets: this.player, 
@@ -82,6 +97,13 @@ export default class MapSprite extends Phaser.GameObjects.Container {
         }
     }
     
+    /**
+     * Helper method to make the map markers
+     * 
+     * @param {*} key 
+     * @param {*} width 
+     * @param {*} color 
+     */
     makeMarkerSprite(key, width, color){
         const graphics = this.scene.make.graphics({x: 0, y: 0});
 
@@ -94,6 +116,14 @@ export default class MapSprite extends Phaser.GameObjects.Container {
         return graphics.generateTexture(key, width, width);
     }
 
+    /**
+     * Helper method to draw the map representation of the dungeon
+     * 
+     * @param {*} key 
+     * @param {*} dungeon 
+     * @param {*} width 
+     * @param {*} height 
+     */
     makeMapGraphic(key, dungeon, width, height){
         
         const graphics = this.scene.make.graphics({x: 0, y: 0});

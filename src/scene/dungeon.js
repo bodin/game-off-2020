@@ -15,6 +15,9 @@ export default class DungeonScene extends Scene {
         this.gameOver = undefined
     }
 
+    /**
+     * called once
+     */
     preload () {        
         this.load.image("tiles", "./assets/tileset/dungeon.png")
         this.load.image("pillar", "./assets/pillar.png")
@@ -29,6 +32,9 @@ export default class DungeonScene extends Scene {
         })
     }
 
+    /**
+     * called once per scene.play() 
+     */
     create () {
         
         this.render = false
@@ -87,6 +93,27 @@ export default class DungeonScene extends Scene {
         this.cameras.main.fadeIn(1000, 0, 0, 0)
     }
 
+    /**
+     * called on the main game thread in a loop
+     */
+    update(){
+        this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
+        this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
+
+        let room = this.player.room;
+        if(this.roomIdPlayer == undefined) this.roomIdPlayer = room.id        
+
+        if(this.roomIdPlayer != room.id){        
+            this.roomIdPlayer = room.id
+            this.playerChangedRoom(this.player.room)           
+        }
+    }
+
+    /**
+     * the player touched a pillar 
+     * @param {*} player 
+     * @param {*} pillar 
+     */
     crumble(player, pillar){
         
         this.pillars.delete(pillar.room.id)
@@ -102,6 +129,13 @@ export default class DungeonScene extends Scene {
             this.hero.pillerFound(C.PILLARS, this.pillars.size)
         }
     }
+
+    /**
+     * the hero touched the player
+     * 
+     * @param {*} player 
+     * @param {*} hero 
+     */    
     playerKilled(player, hero){      
         if (this.render && !this.gameOver) {
             this.gameOver = true;
@@ -121,20 +155,12 @@ export default class DungeonScene extends Scene {
         }        
     }
 
-    update(){
-        this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
-        this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
-
-        let room = this.player.room;
-        if(this.roomIdPlayer == undefined) this.roomIdPlayer = room.id        
-
-        if(this.roomIdPlayer != room.id){        
-            this.roomIdPlayer = room.id
-            this.changeRoom(this.player.room)           
-        }
-    }
-
-    changeRoom(room){
+    /**
+     * The player moved to a new room, update the view
+     * 
+     * @param {*} room 
+     */    
+    playerChangedRoom(room){
         this.map.change=true
 
         this.cameras.main.fadeOut(50, 0, 0, 0, (camera, progress) => {
@@ -160,6 +186,11 @@ export default class DungeonScene extends Scene {
         }, this);
     }
 
+    /**
+     * given an X/Y - returns which dungeon room coorisponds 
+     * @param {*} x 
+     * @param {*} y 
+     */
     getRoomAt(x, y){
 
         let roomNumber = -1
@@ -183,6 +214,13 @@ export default class DungeonScene extends Scene {
         return this.dungeon.rooms[roomNumber]
     }
     
+    /**
+     * given the dungeon which is a 2d array which each entry containing the door definition, make the tilemap layout
+     * 
+     * @param {*} dungeon 
+     * @param {*} width 
+     * @param {*} height 
+     */    
     makeDungeonTiles(dungeon, width, height){
         const tiles = new Array(dungeon.getRows() * height)
         for(let i = 0; i < tiles.length; i++){
@@ -199,6 +237,14 @@ export default class DungeonScene extends Scene {
         return tiles
     }
 
+    /**
+     * given a room - copy the tiles into the larger duncgeon definition
+     * 
+     * @param {*} dungeonTiles 
+     * @param {*} roomTiles 
+     * @param {*} col 
+     * @param {*} row 
+     */    
     copyRoomTiles(dungeonTiles, roomTiles, col, row){
         const offsetRow = roomTiles.length * row
         const offsetCol = roomTiles[0].length * col
@@ -210,6 +256,13 @@ export default class DungeonScene extends Scene {
         }
     }
 
+    /**
+     * given a room (set of doors), create the tilemap
+     * 
+     * @param {*} room 
+     * @param {*} width 
+     * @param {*} height 
+     */    
     makeRoomTiles(room, width, height){
 
         const tile_index = [
@@ -263,6 +316,14 @@ export default class DungeonScene extends Scene {
         
         return tiles
     }
+
+    /**
+     * sets the correct tiles for a door
+     * 
+     * @param {*} tiles 
+     * @param {*} i 
+     * @param {*} j 
+     */    
     makeDoorHorizontal(tiles, i, j){
         tiles[i][j-2]   = TILE.DOOR_HOR_LEFT
         tiles[i][j-1]   = TILE.DOOR_HOR_MIDDLE
@@ -271,6 +332,13 @@ export default class DungeonScene extends Scene {
         tiles[i][j+2]   = TILE.DOOR_HOR_RIGHT
     }
 
+    /**
+     * sets the correct tiles for a door
+     * 
+     * @param {*} tiles 
+     * @param {*} i 
+     * @param {*} j 
+     */    
     makeDoorVertical(tiles, i, j){       
         tiles[i-2][j]   = TILE.DOOR_HOR_LEFT
         tiles[i-1][j]   = TILE.DOOR_HOR_MIDDLE

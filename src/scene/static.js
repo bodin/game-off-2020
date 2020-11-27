@@ -1,6 +1,9 @@
 import {Scene} from 'phaser'
 import * as C from '../model/constants'
 
+/**
+ * Helper class for static scenes
+ */
 export default class StaticScene extends Scene {
    
     constructor(key, image, count, next) {

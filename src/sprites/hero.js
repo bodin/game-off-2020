@@ -3,11 +3,12 @@ import * as C from '../model/constants'
 export default class Hero extends Phaser.Physics.Arcade.Sprite {
 
     /**
-     * Create the player.
-     * @param {object} scene - scene creating the player.
-     * @param {number} x - Start location x value.
-     * @param {number} y - Start location y value.
-     * @param {number} [frame] -
+     * create the hero
+     * @param {*} scene 
+     * @param {*} x 
+     * @param {*} y 
+     * @param {*} texture 
+     * @param {*} room 
      */
     constructor(scene, x, y, texture, room) {
         super(scene, x, y, texture);
@@ -40,6 +41,12 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         this.skipNextRoom = false
     }
 
+    /**
+     * Called when the player removes a pillar from the game
+     * 
+     * @param {*} total 
+     * @param {*} left 
+     */
     pillerFound (total, left){
         if(left == 1){
             if(this.heroTimer){
@@ -66,6 +73,12 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    /**
+     * Called once before the scene updates
+     * 
+     * @param {*} time 
+     * @param {*} delta 
+     */
     preUpdate(time, delta){
         super.preUpdate(time, delta)
 
@@ -79,6 +92,13 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.preUpdateDifferentRoom(time, delta)
         }                      
     }
+
+    /**
+     * Internal method to setup when the player and hero are in the same room
+     * 
+     * @param {*} time 
+     * @param {*} delta 
+     */
     preUpdateSameRoom(time, delta){
         this.visible = true
         let vectorX = this.scene.player.x - this.x, vectorY = this.scene.player.y - this.y
@@ -93,6 +113,12 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         this.skipNextRoom = true
     }
 
+    /**
+     * Internal method to setup when the player and hero are in a different room
+     * 
+     * @param {*} time 
+     * @param {*} delta 
+     */
     preUpdateDifferentRoom(time, delta){
         this.visible = false
         //the player changed rooms
@@ -104,12 +130,18 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             this.possiblySwitchRoom()
         }
     }
-
+    
+    /**
+     * Switches rooms only if there is not a background timer in place to do that task
+     */
     possiblySwitchRoom(){
         if(this.heroTimer || this.heroTimerCrazy) return
         this.executeSwitchRoom()
     }
 
+    /**
+     * Switch room based on the current method (random vs vector)
+     */
     executeSwitchRoom() {     
         this.currentDoor = C.UNKNOWN
 
@@ -128,6 +160,12 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    /**
+     * randomly go through a door
+     * 
+     * @param {*} dungeon 
+     * @param {*} playerRoom 
+     */
     executeNextRoomRandom(dungeon, playerRoom){
 
         let choices = []
@@ -140,6 +178,12 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         return this.changeRoom(dungeon, choice)
     }
 
+    /**
+     * Go throug the door that brings you closer to the player.  If not possible, pick a random door
+     * 
+     * @param {*} dungeon 
+     * @param {*} playerRoom 
+     */
     executeNextRoomVector(dungeon, playerRoom) {
 
         //positive right, negative left
@@ -172,6 +216,13 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             return this.changeRoom(dungeon, choice);
         } 
     }
+
+    /**
+     * given a door, update internal state to the new room
+     * 
+     * @param {*} dungeon 
+     * @param {*} choice - the door to use
+     */
     changeRoom(dungeon, choice){
         if(choice == C.TOP){
             this.currentDoor = C.BOTTOM;
@@ -188,6 +239,12 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         }
         return this.room
     }
+
+    /**
+     * Sets the room and updates the X/Y position of this sprite
+     * 
+     * @param {*} room 
+     */
     setRoom(room){        
         if(room) {
             this.room = room

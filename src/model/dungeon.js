@@ -19,20 +19,37 @@ class Dungeon {
         this.rooms = []
     }
 
+    /**
+     * number of rooms this dungeon is wide
+     */
     getColumns(){
         return this.columns
     }
 
+    /**
+     * number of rooms this dungeon is tall
+     */
     getRows(){
         return this.rows
     }
-
+    /**
+     * Returns a room based on the 0-based col,row index.  Returns null if the index is out of bounds
+     * @param {*} col 
+     * @param {*} row 
+     */
     getRoom(col, row){
         if(col < 0 || col >= C.COLUMNS) return undefined
         if(row < 0 || row >= C.ROWS) return undefined
         return this.rooms[row * this.columns + col]
     }
 
+    /**
+     * create a dungeon with the given rows and columns
+     * 
+     * @param {*} id 
+     * @param {*} columns 
+     * @param {*} rows 
+     */
     static create(id, columns, rows){
         let dungeon = new Dungeon(id, columns, rows)
         let rooms = new Array(rows)
@@ -47,7 +64,7 @@ class Dungeon {
                 doors[C.LEFT] = col == 0 ? C.WALL : rooms[row][col-1].doors[C.RIGHT];
                 doors[C.RIGHT] = col == columns-1 ? C.WALL : C.UNKNOWN;
 
-                rooms[row][col] = Dungeon.createRoom(col + "-" + row, col, row, doors)
+                rooms[row][col] = Dungeon.createRoom(col, row, doors)
             }
         }
         
@@ -56,8 +73,14 @@ class Dungeon {
         return dungeon.adjust()
     }
 
-    static createRoom(id, col, row, doors=[C.UNKNOWN,C.UNKNOWN,C.UNKNOWN,C.UNKNOWN]){
-        const result = new Room(id, col, row);
+    /**
+     * Creates a dungeon room with the given doors.
+     * @param {*} col 
+     * @param {*} row 
+     * @param {*} doors 
+     */
+    static createRoom(col, row, doors=[C.UNKNOWN,C.UNKNOWN,C.UNKNOWN,C.UNKNOWN]){
+        const result = new Room(col + "-" + row, col, row);
         result.doors = [...doors]
         
         if(doors[C.TOP] == C.UNKNOWN)       result.doors[0] = Math.random() > C.DOOR_PROBABILITY ? C.WALL : C.DOOR
@@ -68,10 +91,15 @@ class Dungeon {
         return result
     }
 
+    /**
+     * Walks the dungeon and verifies that every room is connected to every other room
+     * 
+     * @returns this dungeon
+     */
     adjust(){
        
         let roomMap = new Map()
-        this.rooms.forEach( function(r){roomMap.set(r.id, r)})
+        this.rooms.forEach((r) => {roomMap.set(r.id, r)})
         let allRoomMap = new Map([...roomMap])
 
         let roomGroups = []
@@ -100,6 +128,13 @@ class Dungeon {
         return this
     }
 
+    /**
+     * Internal recursive helper method for dungeon verification
+     * @param {*} currentRoom 
+     * @param {*} visitedRooms 
+     * 
+     * @returns a map of rooms (room.id -> room) that are reachable from the current room
+     */
     adjustInternal(currentRoom, visitedRooms){
         if(visitedRooms.has(currentRoom.id)) return visitedRooms;
 
@@ -132,6 +167,15 @@ class Dungeon {
         return visitedRooms
     }
 
+    /**
+     * Merge all groups possible into the first RoomGroup.  
+     * 
+     * The result is all groups that sahre a wall with the first group
+     * are updated with a door and merged into the first group
+     * 
+     * @param {*} allRoomMap - a map of every room (room.id -> room)
+     * @param {*} roomGroups - the list of groups
+     */
     mergeGroups(allRoomMap, roomGroups){
         let groupToExpand = roomGroups[0]
         let expanded = this.expandGroup(groupToExpand)
@@ -177,6 +221,13 @@ class Dungeon {
         return roomGroups
     }
 
+    /**
+     * Expand the current group outward by one set of rooms.
+     * 
+     * @param {*} groupToExpand 
+     * 
+     * @returns a map (room.id -> room) of all rooms that are immediatly outside the border of the rooms in the group.
+     */
     expandGroup(groupToExpand){
         let expanded = new Map()
         

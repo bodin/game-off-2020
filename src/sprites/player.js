@@ -3,11 +3,13 @@ import * as C from '../model/constants'
 export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     /**
-     * Create the player.
-     * @param {object} scene - scene creating the player.
-     * @param {number} x - Start location x value.
-     * @param {number} y - Start location y value.
-     * @param {number} [frame] -
+     * Create the player
+     * 
+     * @param {*} scene 
+     * @param {*} x 
+     * @param {*} y 
+     * @param {*} texture 
+     * @param {*} room 
      */
     constructor(scene, x, y, texture, room) {
         super(scene, x, y, texture);
@@ -42,6 +44,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.room = room
     }
 
+    /**
+     * Called once before the scene updates
+     * 
+     * @param {*} time 
+     * @param {*} delta 
+     */
     preUpdate(time, delta){
         super.preUpdate(time, delta)
         

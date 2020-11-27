@@ -3,11 +3,11 @@
 export default class Piller extends Phaser.Physics.Arcade.Sprite {
 
     /**
-     * Create the player.
-     * @param {object} scene - scene creating the player.
-     * @param {number} x - Start location x value.
-     * @param {number} y - Start location y value.
-     * @param {number} [frame] -
+     * Create the pillar
+     * 
+     * @param {*} scene 
+     * @param {*} texture 
+     * @param {*} room 
      */
     constructor(scene, texture, room) {
         super(scene, 0, 0, texture);
@@ -23,6 +23,12 @@ export default class Piller extends Phaser.Physics.Arcade.Sprite {
         this.setY(this.room.row * C.ROOM_HEIGHT + C.ROOM_HEIGHT/2)
     }
 
+    /**
+     * Called once before the scene updates
+     * 
+     * @param {*} time 
+     * @param {*} delta 
+     */
     preUpdate(time, delta){
         super.preUpdate(time, delta)
     }

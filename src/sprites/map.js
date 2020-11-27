@@ -1,7 +1,7 @@
 import {TOP, BOTTOM, LEFT, RIGHT, WALL} from '../model/dungeon'
 import * as C from '../model/constants'
 
-const MARKER_SIZE=20
+
 
 export default class MapSprite extends Phaser.GameObjects.Container {
 
@@ -20,10 +20,10 @@ export default class MapSprite extends Phaser.GameObjects.Container {
 
         this.scene.textures.remove('map') 
         this.makeMapGraphic('map', scene.dungeon, C.MAP_WIDTH, C.MAP_HEIGHT)
-        this.makeMarkerSprite('boss-marker', MARKER_SIZE, 0xff0000)
-        this.makeMarkerSprite('player-marker', MARKER_SIZE, 0x00ff00)
+        this.makeMarkerSprite('boss-marker', C.MAP_MARKER_SIZE, 0xff0000)
+        this.makeMarkerSprite('player-marker', C.MAP_MARKER_SIZE, 0x00ff00)
         
-        let _x = C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2), _y = C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+        let _x = C.MAP_ROOM_WIDTH/2 - (C.MAP_MARKER_SIZE/2), _y = C.MAP_ROOM_HEIGHT/2 - (C.MAP_MARKER_SIZE/2)
 
         this.map = this.scene.make.sprite({x:0,y:0,key:'map'}).setOrigin(0,0)
         this.hero = this.scene.make.sprite({x:_x,y:_y,key:'boss-marker'}).setOrigin(0,0)
@@ -35,10 +35,10 @@ export default class MapSprite extends Phaser.GameObjects.Container {
         _y = C.MAP_SPACER + C.MAP_HEIGHT
 
         for(let i = 0; i < C.PILLARS; i++){
-            _x = C.MAP_SPACER + (i * distance) +  distance/2 - (MARKER_SIZE/2)
+            _x = C.MAP_SPACER + (i * distance) +  distance/2 - (C.MAP_MARKER_SIZE/2)
 
             this.scene.textures.remove('pillar-marker-' + i) 
-            this.makeMarkerSprite('pillar-marker-' + i, MARKER_SIZE, 0xffffff)
+            this.makeMarkerSprite('pillar-marker-' + i, C.MAP_MARKER_SIZE, 0xffffff)
             this.pillars.push(this.scene.make.sprite({x:_x,y:_y,key:'pillar-marker-' + i}).setOrigin(0,0).setAlpha(.25))           
         }
         this.add(this.map).add(this.hero).add(this.player).add(this.pillars)
@@ -77,8 +77,8 @@ export default class MapSprite extends Phaser.GameObjects.Container {
                 ease: 'EaseIOut',       
                 duration: 100,            
                 delay:75,
-                x: heroRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2),
-                y: heroRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+                x: heroRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (C.MAP_MARKER_SIZE/2),
+                y: heroRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (C.MAP_MARKER_SIZE/2)
             })
         }
 
@@ -91,8 +91,8 @@ export default class MapSprite extends Phaser.GameObjects.Container {
                            ease: 'EaseIOut',       
                            duration: 100,            
                            delay:75,
-                           x: playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2),
-                           y: playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
+                           x: playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (C.MAP_MARKER_SIZE/2),
+                           y: playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (C.MAP_MARKER_SIZE/2)
                        })
         }
     }

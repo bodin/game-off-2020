@@ -19,7 +19,9 @@ export const MAP_HEIGHT = 180
 export const MAP_ROOM_WIDTH = MAP_WIDTH/COLUMNS
 export const MAP_ROOM_HEIGHT = MAP_WIDTH/COLUMNS
 
+
 export const MAP_SPACER = ((SCREEN_WIDTH - ROOM_WIDTH - MAP_WIDTH)/2)
+export const MAP_MARKER_SIZE = 20
 
 export const TOP = 0
 export const LEFT = 1

@@ -26,7 +26,7 @@ export default class DungeonScene extends Scene {
         this.load.spritesheet("hero", "./assets/hero.png", {
             frameWidth: 32,
             frameHeight: 32
-        })   
+        })
     }
 
     create () {
@@ -68,7 +68,7 @@ export default class DungeonScene extends Scene {
         this.hero = new Hero(this, 200, 200, 'hero', this.dungeon.getRoom(C.COLUMNS-1, C.ROWS-1));
         this.physics.add.collider(this.hero, this.dungeonLayer);
 
-        this.physics.add.collider(this.player, this.hero, this.heDead.bind(this));
+        this.physics.add.collider(this.player, this.hero, this.playerKilled.bind(this));
       
         this.pillars = new Map()
         for(let i = 0; i < C.PILLARS; i++){
@@ -86,13 +86,11 @@ export default class DungeonScene extends Scene {
         this.cameras.main.fadeIn(1000, 0, 0, 0)
     }
 
-    heroNextRoom() {        
-        this.hero.switchRoom(this.dungeon, this.player.room)
-    }
-
     crumble(player, pillar){
+        
         this.pillars.delete(pillar.room.id)
         pillar.destroy()
+
         if(this.pillars.size == 0){
             this.cameras.main.fadeOut(1000, 0, 0, 0)
             
@@ -100,11 +98,13 @@ export default class DungeonScene extends Scene {
                 this.scene.start('win-scene')
             })
         } else{
-            this.checkHeroNextRoom(false)
+            this.hero.pillerFound(C.PILLARS, this.pillars.size)
         }
     }
-    heDead(player, hero){
+    playerKilled(player, hero){
         if (!this.gameOver) {
+            this.gameOver = true;
+
             player.canMove = false
             hero.canMove = false
             hero.alpha = 0.2
@@ -117,7 +117,7 @@ export default class DungeonScene extends Scene {
                     this.scene.start('dead-scene')
                 })
             }).bind(this));
-            this.gameOver = true;
+            
         }        
     }
 
@@ -125,63 +125,31 @@ export default class DungeonScene extends Scene {
         this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
         this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
 
-        let room = this.getCurrentRoom();
+        let room = this.getRoomAt(this.player.x, this.player.y);
 
-        if(!this.player.room || this.player.room.id != room.id){
+        if(this.player.room.id != room.id){
             this.player.room = room        
-            this.changeRoomAnimimation()
             this.map.change=true
-        }
-    }
-    checkHeroNextRoom(force){
-        if(this.pillars.length == 1){
-            if(this.heroTimer){
-                this.heroTimer.remove();
-            }
-            if(!this.heroTimerCrazy){
-                this.heroTimerCrazy = this.time.addEvent({
-                    delay: C.HERO_SPEED_ROOM_SWITCH_CRAZY,
-                    callback: this.heroNextRoom,
-                    callbackScope: this,
-                    loop: true
-                });                 
-            }
-
-        }else if(2*this.pillars.size < C.PILLARS) {
-            if(!this.heroTimer){
-                this.heroTimer = this.time.addEvent({
-                    delay: C.HERO_SPEED_ROOM_SWITCH_NORMAL,                
-                    callback: this.heroNextRoom,
-                    callbackScope: this,
-                    loop: true
-                });                 
-            }   
-        }else if(force){
-            this.heroNextRoom(); 
+            this.changeRoomAnimimation(this.player.room)           
         }
     }
 
-    changeRoomAnimimation(){
-        let room = this.player.room
-
+    changeRoomAnimimation(room){        
         this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
-            this.player.canMove = false
-            if (progress === 1) {
-                
-                this.checkHeroNextRoom(true);
-
+            this.player.canMove = false            
+            if (progress === 1) {                
                 this.maskShape.x = room.column * C.ROOM_WIDTH
                 this.maskShape.y = room.row * C.ROOM_HEIGHT
 
                 // Change camera boundaries when fade out complete.
-                this.cameras.main.setBounds(room.column * C.ROOM_WIDTH,
+                camera.setBounds(room.column * C.ROOM_WIDTH,
                     room.row * C.ROOM_HEIGHT,
                     C.ROOM_WIDTH,
                     C.ROOM_HEIGHT,
                     true)
 
                 // Fade back in with new boundareis.
-                this.cameras.main.fadeIn(100, 0, 0, 0, (camera, progress) => {
+                camera.fadeIn(100, 0, 0, 0, (camera, progress) => {
                     if (progress === 1) {
                         this.player.canMove = true
                     }
@@ -190,7 +158,7 @@ export default class DungeonScene extends Scene {
         }, this);
     }
 
-    getCurrentRoom(){
+    getRoomAt(x, y){
 
         let roomNumber = 0
         // loop through rooms in this level.
@@ -203,8 +171,8 @@ export default class DungeonScene extends Scene {
             let roomBottom = roomTop + C.ROOM_HEIGHT
 
             // Player is within the boundaries of this room.
-            if (this.player.x > roomLeft && this.player.x < roomRight &&
-                this.player.y > roomTop  && this.player.y < roomBottom) {
+            if (x > roomLeft && x < roomRight &&
+                y > roomTop  && y < roomBottom) {
 
                 roomNumber = i;
             }

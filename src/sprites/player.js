@@ -49,7 +49,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         if(!this.scene.render || !this.canMove) return
 
-        if (this.scene.player.room.id == this.scene.hero.room.id) {
+        if (this.room.id == this.scene.hero.room.id) {
             this.velocity = C.PLAYER_SPEED_RUNNING
         }else{
             this.velocity = C.PLAYER_SPEED_WALKING

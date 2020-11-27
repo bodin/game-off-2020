@@ -34,7 +34,8 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         //custom attributes
         this.room = room
         this.canMove = true 
-        this.lastRoomId = undefined
+        this.lastRoomIdHero = undefined
+        this.lastRoomIdPlayer = undefined
         this.currentDoor = C.UNKNOWN
         this.skipNextRoom = false
     }
@@ -45,12 +46,40 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(0, 0)
                 
         if(!this.scene.render || !this.canMove) return
-   
-        // in room mode
-        if (this.lastRoomId != this.room.id) {
+
+        if (this.scene.player.room.id == this.room.id) {
+            this.preUpdateSameRoom(time, delta)
+        }else{
+            this.preUpdateDifferentRoom(time, delta)
+        }                      
+    }
+    preUpdateSameRoom(time, delta){
+        this.visible = true
+        let vectorX = this.scene.player.x - this.x, vectorY = this.scene.player.y - this.y
+
+        let normal = Math.max(Math.abs(vectorX), Math.abs(vectorY))
+        vectorX = vectorX/normal
+        vectorY = vectorY/normal
+
+        this.setVelocity(C.HERO_SPEED_RUNNING*vectorX, C.HERO_SPEED_RUNNING*vectorY)
+
+        this.play("hero-walk-up", true)
+        this.skipNextRoom = true
+    }
+
+    preUpdateDifferentRoom(time, delta){
+        //the player changed rooms
+        if(this.lastRoomIdPlayer != this.scene.player.room.id){
+            this.lastRoomIdPlayer = this.scene.player.room.id
+
+            this.switchRoom()
+        }
+
+        //we changed rooms
+        if(this.lastRoomIdHero != this.room.id){
+            this.lastRoomIdHero = this.room.id
             this.visible = false
-            this.lastRoomId = this.room.id
-           
+        
             let offsetX = C.ROOM_WIDTH/2
             let offsetY = C.ROOM_HEIGHT/2
 
@@ -63,24 +92,41 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
 
             this.setX((C.ROOM_WIDTH * this.room.column) + offsetX)
             this.setY((C.ROOM_HEIGHT * this.room.row) + offsetY)
-
-        // attack mode
-        } else if (this.scene.player.room.id == this.room.id) {
-            this.visible = true
-            let vectorX = this.scene.player.x - this.x, vectorY = this.scene.player.y - this.y
-
-            let normal = Math.max(Math.abs(vectorX), Math.abs(vectorY))
-            vectorX = vectorX/normal
-            vectorY = vectorY/normal
-
-            this.setVelocity(C.HERO_SPEED_RUNNING*vectorX, C.HERO_SPEED_RUNNING*vectorY)
-
-            this.play("hero-walk-up", true)
-            this.skipNextRoom = true
-        }        
+        }
     }
 
-    switchRoom(dungeon, playerRoom) {
+    pillerFound (total, left){
+        if(left == 1){
+            if(this.heroTimer){
+                this.heroTimer.remove();
+            }
+            if(!this.heroTimerCrazy){
+                this.heroTimerCrazy = this.scene.time.addEvent({
+                    delay: C.HERO_SPEED_ROOM_SWITCH_CRAZY,
+                    callback: this.executeSwitchRoom,
+                    callbackScope: this,
+                    loop: true
+                });                 
+            }
+
+        }else if(2*left < total) {
+            if(!this.heroTimer){
+                this.heroTimer = this.scene.time.addEvent({
+                    delay: C.HERO_SPEED_ROOM_SWITCH_NORMAL,                
+                    callback: this.executeSwitchRoom,
+                    callbackScope: this,
+                    loop: true
+                });                 
+            }   
+        }
+    }
+
+    switchRoom(){
+        if(this.heroTimer || this.heroTimerCrazy) return
+        this.executeSwitchRoom()
+    }
+    
+    executeSwitchRoom() {        
         this.currentDoor = C.UNKNOWN
 
         if(this.skipNextRoom){
@@ -88,14 +134,17 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
             return this.room            
         }
 
+        let dungeon = this.scene.dungeon;
+        let playerRoom = this.scene.player.room;
+
         if(this.scene.pillars.size == C.PILLARS){
-            return this.getNextRoomRandom(dungeon, playerRoom)
+            return this.executeNextRoomRandom(dungeon, playerRoom)
         } else{ 
-            return this.getNextRoomVector(dungeon, playerRoom)
+            return this.executeNextRoomVector(dungeon, playerRoom)
         }
     }
 
-    getNextRoomRandom(dungeon, playerRoom){
+    executeNextRoomRandom(dungeon, playerRoom){
 
         let choices = []
         if(this.room.doors[C.TOP] == C.DOOR) choices.push(C.TOP)
@@ -108,7 +157,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
 
     }
 
-    getNextRoomVector(dungeon, playerRoom) {
+    executeNextRoomVector(dungeon, playerRoom) {
 
         //positive right, negative left
         let vectorX = playerRoom.column - this.room.column
@@ -135,7 +184,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         }
 
         if(choice == undefined){        
-            return this.getNextRoomRandom(dungeon, playerRoom)
+            return this.executeNextRoomRandom(dungeon, playerRoom)
         } else {
             return this.changeRoom(dungeon, choice);
         } 

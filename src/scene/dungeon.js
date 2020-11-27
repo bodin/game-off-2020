@@ -33,6 +33,7 @@ export default class DungeonScene extends Scene {
         
         this.render = false
         this.gameOver = undefined
+        this.roomIdPlayer = undefined
 
         this.dungeon = Dungeon.create('foo', C.COLUMNS, C.ROWS);                
         let dungeonTiles = this.makeDungeonTiles(this.dungeon, C.ROOM_TILE_WIDTH, C.ROOM_TILE_HEIGHT)
@@ -92,7 +93,7 @@ export default class DungeonScene extends Scene {
         pillar.destroy()
 
         if(this.pillars.size == 0){
-            this.cameras.main.fadeOut(1000, 0, 0, 0)
+            this.cameras.main.fadeOut(200, 0, 0, 0)
             
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
                 this.scene.start('win-scene')
@@ -101,8 +102,8 @@ export default class DungeonScene extends Scene {
             this.hero.pillerFound(C.PILLARS, this.pillars.size)
         }
     }
-    playerKilled(player, hero){
-        if (!this.gameOver) {
+    playerKilled(player, hero){      
+        if (this.render && !this.gameOver) {
             this.gameOver = true;
 
             player.canMove = false
@@ -111,13 +112,12 @@ export default class DungeonScene extends Scene {
             player.play("player-explode");
             player.once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, (() => {
                 player.setFrame(14);              
-                this.cameras.main.fadeOut(1000, 0, 0, 0)
+                this.cameras.main.fadeOut(200, 0, 0, 0)
                         
                 this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
                     this.scene.start('dead-scene')
                 })
-            }).bind(this));
-            
+            }).bind(this));            
         }        
     }
 
@@ -125,17 +125,19 @@ export default class DungeonScene extends Scene {
         this.map.x = this.cameras.main.worldView.x + C.ROOM_WIDTH + C.MAP_SPACER
         this.map.y = this.cameras.main.worldView.y + C.MAP_SPACER
 
-        let room = this.getRoomAt(this.player.x, this.player.y);
+        let room = this.player.room;
+        if(this.roomIdPlayer == undefined) this.roomIdPlayer = room.id        
 
-        if(this.player.room.id != room.id){
-            this.player.room = room        
-            this.map.change=true
-            this.changeRoomAnimimation(this.player.room)           
+        if(this.roomIdPlayer != room.id){        
+            this.roomIdPlayer = room.id
+            this.changeRoom(this.player.room)           
         }
     }
 
-    changeRoomAnimimation(room){        
-        this.cameras.main.fadeOut(250, 0, 0, 0, (camera, progress) => {
+    changeRoom(room){
+        this.map.change=true
+
+        this.cameras.main.fadeOut(50, 0, 0, 0, (camera, progress) => {
             this.player.canMove = false            
             if (progress === 1) {                
                 this.maskShape.x = room.column * C.ROOM_WIDTH
@@ -160,7 +162,7 @@ export default class DungeonScene extends Scene {
 
     getRoomAt(x, y){
 
-        let roomNumber = 0
+        let roomNumber = -1
         // loop through rooms in this level.
         for (let i = 0; i < this.dungeon.rooms.length; i++) {
             const room = this.dungeon.rooms[i]
@@ -171,8 +173,9 @@ export default class DungeonScene extends Scene {
             let roomBottom = roomTop + C.ROOM_HEIGHT
 
             // Player is within the boundaries of this room.
-            if (x > roomLeft && x < roomRight &&
-                y > roomTop  && y < roomBottom) {
+            if (roomNumber != -1 && 
+                x >= roomLeft && x <= roomRight &&
+                y >= roomTop  && y <= roomBottom) {
 
                 roomNumber = i;
             }

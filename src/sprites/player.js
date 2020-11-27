@@ -47,6 +47,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         this.setVelocity(0, 0)       
 
+        this.room = this.scene.getRoomAt(this.x, this.y);
+
         if(!this.scene.render || !this.canMove) return
 
         if (this.room.id == this.scene.hero.room.id) {

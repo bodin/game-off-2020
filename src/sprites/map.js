@@ -61,8 +61,8 @@ export default class MapSprite extends Phaser.GameObjects.Container {
             this.scene.tweens.add({
                 targets: this.hero, 
                 ease: 'EaseIOut',       
-                duration: 250,            
-                delay:500,
+                duration: 100,            
+                delay:75,
                 x: heroRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2),
                 y: heroRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
             })
@@ -74,8 +74,8 @@ export default class MapSprite extends Phaser.GameObjects.Container {
             this.scene.tweens.add({
                            targets: this.player, 
                            ease: 'EaseIOut',       
-                           duration: 250,            
-                           delay:500,
+                           duration: 100,            
+                           delay:75,
                            x: playerRoom.column * C.MAP_ROOM_WIDTH + C.MAP_ROOM_WIDTH/2 - (MARKER_SIZE/2),
                            y: playerRoom.row * C.MAP_ROOM_HEIGHT + C.MAP_ROOM_HEIGHT/2 - (MARKER_SIZE/2)
                        })

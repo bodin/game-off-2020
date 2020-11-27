@@ -69,7 +69,11 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
 
     preUpdateDifferentRoom(time, delta){
         //the player changed rooms
-        if(this.lastRoomIdPlayer != this.scene.player.room.id){
+        if(this.lastRoomIdPlayer == undefined){
+            this.lastRoomIdPlayer = this.scene.player.room.id
+        } 
+        
+        if(this.lastRoomIdPlayer != this.scene.player.room.id) {
             this.lastRoomIdPlayer = this.scene.player.room.id
 
             this.switchRoom()
@@ -125,7 +129,7 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         if(this.heroTimer || this.heroTimerCrazy) return
         this.executeSwitchRoom()
     }
-    
+
     executeSwitchRoom() {        
         this.currentDoor = C.UNKNOWN
 

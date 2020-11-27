@@ -38,7 +38,6 @@ export default class Hero extends Phaser.Physics.Arcade.Sprite {
         this.lastRoomIdPlayer = undefined
         this.currentDoor = C.UNKNOWN
         this.skipNextRoom = false
-        
     }
 
     pillerFound (total, left){

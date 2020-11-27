@@ -164,7 +164,7 @@ export default class DungeonScene extends Scene {
 
         let roomNumber = -1
         // loop through rooms in this level.
-        for (let i = 0; i < this.dungeon.rooms.length; i++) {
+        for (let i = 0; i < this.dungeon.rooms.length && roomNumber == -1; i++) {
             const room = this.dungeon.rooms[i]
 
             let roomLeft   = room.column * C.ROOM_WIDTH
@@ -173,8 +173,7 @@ export default class DungeonScene extends Scene {
             let roomBottom = roomTop + C.ROOM_HEIGHT
 
             // Player is within the boundaries of this room.
-            if (roomNumber != -1 && 
-                x >= roomLeft && x <= roomRight &&
+            if (x >= roomLeft && x <= roomRight &&
                 y >= roomTop  && y <= roomBottom) {
 
                 roomNumber = i;
